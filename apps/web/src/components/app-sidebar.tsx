@@ -99,7 +99,7 @@ export function AppSidebar({ kind }: { kind: SidebarKind }) {
       </SidebarContent>
       <SidebarFooter>
         <div className="p-1">
-          <UserMenu />
+          <UserMenu side="right" align="end" />
         </div>
       </SidebarFooter>
     </Sidebar>

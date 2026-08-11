@@ -35,7 +35,7 @@ export function PersonalHeader() {
           </nav>
         </div>
         <div className="flex items-center gap-2">
-          <UserMenu compact />
+          <UserMenu className="w-auto" side="bottom" align="end" />
         </div>
       </div>
     </header>
