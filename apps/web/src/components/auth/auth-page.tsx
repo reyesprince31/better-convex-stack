@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { AuthModeSwitcher } from "@/components/auth-mode-switcher";
+import { AuthModeSwitcher } from "@/components/auth/auth-mode-switcher";
 
 export default function AuthPage({ initialMode }: { initialMode: "sign-in" | "sign-up" }) {
   return (

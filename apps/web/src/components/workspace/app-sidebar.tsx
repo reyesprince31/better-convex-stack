@@ -10,9 +10,9 @@ import {
 import Link from "next/link";
 import type { Route } from "next";
 
-import UserMenu from "@/components/user-menu";
+import UserMenu from "@/components/account/user-menu";
 import { getMockOrganization } from "@/lib/mock-workspace";
-import { WorkspaceSwitcher } from "@/components/workspace-switcher";
+import { WorkspaceSwitcher } from "@/components/workspace/workspace-switcher";
 import {
   Sidebar,
   SidebarContent,

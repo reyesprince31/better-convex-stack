@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import UserMenu from "@/components/user-menu";
+import UserMenu from "@/components/account/user-menu";
 
 export function PersonalHeader() {
   return (

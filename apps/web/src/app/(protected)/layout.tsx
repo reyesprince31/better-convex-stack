@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 
-import { ProtectedShellSkeleton } from "@/components/workspace-sidebar-layout";
+import { ProtectedShellSkeleton } from "@/components/workspace/workspace-sidebar-layout";
 import { requireAuth } from "@/lib/require-auth";
 
 export default function ProtectedLayout({ children }: { children: React.ReactNode }) {

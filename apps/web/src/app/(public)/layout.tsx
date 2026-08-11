@@ -1,4 +1,4 @@
-import { PublicNav } from "@/components/public-nav";
+import { PublicNav } from "@/components/navigation/public-nav";
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (

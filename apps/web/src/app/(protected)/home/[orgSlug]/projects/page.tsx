@@ -1,7 +1,7 @@
 import { FolderKanban } from "lucide-react";
 import { use } from "react";
 
-import { OrganizationResourcePage } from "@/components/organization-resource-page";
+import { OrganizationResourcePage } from "@/components/organization/organization-resource-page";
 import { getMockOrganization } from "@/lib/mock-workspace";
 
 export default function OrganizationProjectsPage({ params }: { params: Promise<{ orgSlug: string }> }) {

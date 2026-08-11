@@ -10,6 +10,11 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## Route architecture
 
+- Organize `src/components` by feature instead of keeping a flat component
+  directory: `auth`, `admin`, `organization`, `workspace`, `navigation`,
+  `account`, `theme`, `providers`, and `shared`. Keep feature-specific
+  subcomponents beside the route-facing component they support, and import
+  them through their feature path rather than adding a broad barrel file.
 - Public pages live under `src/app/(public)` and own their marketing, journal,
   and authentication navigation. The `(public)` group does not appear in URLs.
 - Authenticated SaaS pages live under `src/app/(protected)`: `/home` is the

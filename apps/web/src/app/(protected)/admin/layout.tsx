@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 
-import { AdminAccessGate } from "@/components/admin-access-gate";
-import { WorkspaceSidebarLayout } from "@/components/workspace-sidebar-layout";
+import { AdminAccessGate } from "@/components/admin/admin-access-gate";
+import { WorkspaceSidebarLayout } from "@/components/workspace/workspace-sidebar-layout";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (

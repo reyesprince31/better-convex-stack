@@ -1,4 +1,4 @@
-import { PersonalHeader } from "@/components/personal-header";
+import { PersonalHeader } from "@/components/workspace/personal-header";
 
 export default function PersonalLayout({ children }: { children: React.ReactNode }) {
   return (

@@ -1,6 +1,6 @@
 import { CreditCard } from "lucide-react";
 
-import { AdminResourcePage } from "@/components/admin-resource-page";
+import { AdminResourcePage } from "@/components/admin/admin-resource-page";
 import { mockAdminResources } from "@/lib/mock-workspace";
 
 export default function AdminSubscriptionsPage() {

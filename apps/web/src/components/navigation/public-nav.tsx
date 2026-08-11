@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { ModeToggle } from "@/components/mode-toggle";
+import { ModeToggle } from "@/components/theme/mode-toggle";
 
 const links = [
   { href: "/blog", label: "Journal" },
@@ -19,7 +19,11 @@ export function PublicNav() {
         </Link>
         <nav className="hidden items-center gap-7 text-xs text-muted-foreground md:flex">
           {links.map((link) => (
-            <Link key={link.href} href={link.href} className="transition-colors hover:text-foreground">
+            <Link
+              key={link.href}
+              href={link.href}
+              className="transition-colors hover:text-foreground"
+            >
               {link.label}
             </Link>
           ))}

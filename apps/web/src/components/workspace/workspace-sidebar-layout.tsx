@@ -5,7 +5,7 @@ import {
   SidebarTrigger,
 } from "@better-convex-stack/ui/components/sidebar";
 
-import { AppSidebar } from "@/components/app-sidebar";
+import { AppSidebar } from "@/components/workspace/app-sidebar";
 
 export function WorkspaceSidebarLayout({
   kind,

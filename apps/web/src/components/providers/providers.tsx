@@ -3,15 +3,12 @@
 import { env } from "@better-convex-stack/env/web";
 import { Toaster } from "@better-convex-stack/ui/components/sonner";
 import { TooltipProvider } from "@better-convex-stack/ui/components/tooltip";
-import {
-  ConvexBetterAuthProvider,
-  type AuthClient,
-} from "@convex-dev/better-auth/react";
+import { ConvexBetterAuthProvider, type AuthClient } from "@convex-dev/better-auth/react";
 import { ConvexReactClient } from "convex/react";
 
 import { authClient } from "@/lib/auth-client";
 
-import { ThemeProvider } from "./theme-provider";
+import { ThemeProvider } from "@/components/theme/theme-provider";
 
 const convex = new ConvexReactClient(env.NEXT_PUBLIC_CONVEX_URL);
 
