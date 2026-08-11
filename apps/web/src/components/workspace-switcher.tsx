@@ -16,7 +16,7 @@ import type { Route } from "next";
 
 import { mockOrganizations } from "@/lib/mock-workspace";
 
-const workspaces = [
+export const workspaceOptions = [
   { href: "/home", label: "Personal", detail: "Your private workspace", icon: CircleUserRound },
   ...mockOrganizations.map((organization) => ({
     href: `/home/${organization.slug}`,
@@ -29,16 +29,19 @@ const workspaces = [
 export function WorkspaceSwitcher({ className }: { className?: string } = {}) {
   const pathname = usePathname();
   const router = useRouter();
-  const current = workspaces.find((workspace) => {
-    return workspace.href === "/home"
-      ? pathname === workspace.href
-      : pathname === workspace.href || pathname.startsWith(`${workspace.href}/`);
-  }) ?? workspaces[0];
+  const current =
+    workspaceOptions.find((workspace) => {
+      return workspace.href === "/home"
+        ? pathname === workspace.href
+        : pathname === workspace.href || pathname.startsWith(`${workspace.href}/`);
+    }) ?? workspaceOptions[0];
   const CurrentIcon = current.icon;
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger render={<Button variant="outline" size="sm" className={`gap-2 ${className ?? ""}`} />}>
+      <DropdownMenuTrigger
+        render={<Button variant="outline" size="sm" className={`gap-2 ${className ?? ""}`} />}
+      >
         <CurrentIcon className="size-3.5" />
         <span>{current.label}</span>
         <ChevronDown className="size-3.5 text-muted-foreground" />
@@ -47,7 +50,7 @@ export function WorkspaceSwitcher({ className }: { className?: string } = {}) {
       <DropdownMenuContent align="start" className="w-64">
         <DropdownMenuGroup>
           <DropdownMenuLabel>Switch workspace</DropdownMenuLabel>
-          {workspaces.map((workspace) => {
+          {workspaceOptions.map((workspace) => {
             const Icon = workspace.icon;
             const isCurrent = workspace.href === current.href;
 

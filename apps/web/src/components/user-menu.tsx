@@ -2,6 +2,7 @@
 
 import { api } from "@better-convex-stack/backend/convex/_generated/api";
 import { Button } from "@better-convex-stack/ui/components/button";
+import { Skeleton } from "@better-convex-stack/ui/components/skeleton";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,16 +13,52 @@ import {
   DropdownMenuTrigger,
 } from "@better-convex-stack/ui/components/dropdown-menu";
 import { useQuery } from "convex/react";
-import { ChevronDown, Home, LogOut, Settings2, ShieldCheck } from "lucide-react";
+import {
+  Check,
+  ChevronDown,
+  Home,
+  LogOut,
+  Monitor,
+  Moon,
+  Settings2,
+  ShieldCheck,
+  Sun,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { Route } from "next";
+import { useTheme } from "next-themes";
 
 import { authClient } from "@/lib/auth-client";
+import { workspaceOptions } from "@/components/workspace-switcher";
+
+const themeOptions = [
+  { value: "light", label: "Light", icon: Sun },
+  { value: "dark", label: "Dark", icon: Moon },
+  { value: "system", label: "System", icon: Monitor },
+] as const;
 
 export default function UserMenu() {
   const pathname = usePathname();
   const user = useQuery(api.auth.getCurrentUser);
+  const { setTheme, theme } = useTheme();
+
+  if (!user) {
+    return (
+      <Button
+        variant="outline"
+        size="sm"
+        className="h-9 gap-2 px-2"
+        disabled
+        aria-label="Loading account"
+      >
+        <Skeleton className="size-6 rounded-full" />
+        <Skeleton className="hidden h-3 w-14 sm:block" />
+        <ChevronDown className="size-3.5 text-muted-foreground" />
+      </Button>
+    );
+  }
+
   const displayName = user?.name?.trim() || user?.email?.split("@")[0] || "Account";
   const isAdminPanel = pathname === "/admin" || pathname.startsWith("/admin/");
   const contextLink = isAdminPanel
@@ -40,7 +77,12 @@ export default function UserMenu() {
     <DropdownMenu>
       <DropdownMenuTrigger
         render={
-          <Button variant="outline" size="sm" className="h-9 gap-2 px-2" aria-label="Open account menu" />
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-9 gap-2 px-2"
+            aria-label="Open account menu"
+          />
         }
       >
         <span className="flex size-6 items-center justify-center rounded-full bg-foreground text-[10px] font-medium text-background">
@@ -55,6 +97,49 @@ export default function UserMenu() {
             <p className="font-medium text-foreground">{displayName}</p>
             <p className="mt-1 truncate text-[11px]">{user?.email ?? "Signed-in account"}</p>
           </DropdownMenuLabel>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>Workspace</DropdownMenuLabel>
+          {workspaceOptions.map((workspace) => {
+            const Icon = workspace.icon;
+            const isCurrent =
+              workspace.href === "/home"
+                ? pathname === workspace.href
+                : pathname === workspace.href || pathname.startsWith(`${workspace.href}/`);
+
+            return (
+              <DropdownMenuItem
+                key={workspace.href}
+                render={<Link href={workspace.href as Route} />}
+                className="gap-3 py-2.5"
+              >
+                <Icon className="size-4 text-muted-foreground" />
+                <span className="grid flex-1 text-left">
+                  <span className="text-xs font-medium">{workspace.label}</span>
+                  <span className="text-[10px] text-muted-foreground">{workspace.detail}</span>
+                </span>
+                {isCurrent ? <Check className="size-3.5 text-emerald-500" /> : null}
+              </DropdownMenuItem>
+            );
+          })}
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>Appearance</DropdownMenuLabel>
+          {themeOptions.map((option) => {
+            const Icon = option.icon;
+
+            return (
+              <DropdownMenuItem key={option.value} onClick={() => setTheme(option.value)}>
+                <Icon />
+                {option.label}
+                {theme === option.value ? (
+                  <Check className="ml-auto size-3.5 text-emerald-500" />
+                ) : null}
+              </DropdownMenuItem>
+            );
+          })}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         {contextLink ? (

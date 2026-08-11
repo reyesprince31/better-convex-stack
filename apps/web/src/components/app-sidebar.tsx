@@ -17,7 +17,6 @@ import { useParams } from "next/navigation";
 import type { Route } from "next";
 
 import UserMenu from "@/components/user-menu";
-import { WorkspaceSwitcher } from "@/components/workspace-switcher";
 import { getMockOrganization } from "@/lib/mock-workspace";
 import {
   Sidebar,
@@ -73,7 +72,6 @@ export function AppSidebar({ kind }: { kind: SidebarKind }) {
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
-        {!isAdmin ? <WorkspaceSwitcher className="w-full justify-start" /> : null}
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
@@ -84,15 +82,12 @@ export function AppSidebar({ kind }: { kind: SidebarKind }) {
                 const href = (isAdmin ? item.path : `/home/${orgSlug}${item.path}`) as Route;
 
                 return (
-                <SidebarMenuItem key={label}>
-                  <SidebarMenuButton
-                    render={<Link href={href} />}
-                    tooltip={label}
-                  >
-                    <Icon />
-                    <span>{label}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                  <SidebarMenuItem key={label}>
+                    <SidebarMenuButton render={<Link href={href} />} tooltip={label}>
+                      <Icon />
+                      <span>{label}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
                 );
               })}
             </SidebarMenu>
@@ -116,7 +111,10 @@ export function AppSidebar({ kind }: { kind: SidebarKind }) {
               </SidebarMenuItem>
               {!isAdmin ? (
                 <SidebarMenuItem>
-                  <SidebarMenuButton render={<Link href={`/home/${orgSlug}/settings` as Route} />} tooltip="Settings">
+                  <SidebarMenuButton
+                    render={<Link href={`/home/${orgSlug}/settings` as Route} />}
+                    tooltip="Settings"
+                  >
                     <Settings2 />
                     <span>Settings</span>
                   </SidebarMenuButton>
@@ -130,7 +128,10 @@ export function AppSidebar({ kind }: { kind: SidebarKind }) {
         <div className="p-1">
           <UserMenu />
         </div>
-        <Link href="/home" className="flex items-center gap-2 px-2 py-2 text-xs text-sidebar-foreground/60 transition-colors hover:text-sidebar-foreground">
+        <Link
+          href="/home"
+          className="flex items-center gap-2 px-2 py-2 text-xs text-sidebar-foreground/60 transition-colors hover:text-sidebar-foreground"
+        >
           <ArrowLeft className="size-3.5" />
           Back to personal
         </Link>
