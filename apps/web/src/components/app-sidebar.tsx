@@ -93,23 +93,23 @@ export function AppSidebar({ kind }: { kind: SidebarKind }) {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        <SidebarGroup>
-          <SidebarGroupLabel>Quick links</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton render={<Link href="/home" />} tooltip="Personal workspace">
-                  <CircleUserRound />
-                  <span>Personal workspace</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton render={<Link href="/blog" />} tooltip="Journal">
-                  <BookOpen />
-                  <span>Journal</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              {!isAdmin ? (
+        {!isAdmin ? (
+          <SidebarGroup>
+            <SidebarGroupLabel>Quick links</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton render={<Link href="/home" />} tooltip="Personal workspace">
+                    <CircleUserRound />
+                    <span>Personal workspace</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton render={<Link href="/blog" />} tooltip="Journal">
+                    <BookOpen />
+                    <span>Journal</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton
                     render={<Link href={`/home/${orgSlug}/settings` as Route} />}
@@ -119,22 +119,24 @@ export function AppSidebar({ kind }: { kind: SidebarKind }) {
                     <span>Settings</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-              ) : null}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ) : null}
       </SidebarContent>
       <SidebarFooter>
         <div className="p-1">
           <UserMenu />
         </div>
-        <Link
-          href="/home"
-          className="flex items-center gap-2 px-2 py-2 text-xs text-sidebar-foreground/60 transition-colors hover:text-sidebar-foreground"
-        >
-          <ArrowLeft className="size-3.5" />
-          Back to personal
-        </Link>
+        {!isAdmin ? (
+          <Link
+            href="/home"
+            className="flex items-center gap-2 px-2 py-2 text-xs text-sidebar-foreground/60 transition-colors hover:text-sidebar-foreground"
+          >
+            <ArrowLeft className="size-3.5" />
+            Back to personal
+          </Link>
+        ) : null}
       </SidebarFooter>
     </Sidebar>
   );
