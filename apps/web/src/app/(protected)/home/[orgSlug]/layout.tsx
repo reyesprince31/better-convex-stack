@@ -1,6 +1,9 @@
-import { use } from "react";
+import { Suspense } from "react";
 
-import { WorkspaceSidebarLayout } from "@/components/workspace/workspace-sidebar-layout";
+import {
+  ProtectedShellSkeleton,
+  WorkspaceSidebarLayout,
+} from "@/components/workspace/workspace-sidebar-layout";
 
 export default function OrganizationLayout({
   children,
@@ -9,7 +12,21 @@ export default function OrganizationLayout({
   children: React.ReactNode;
   params: Promise<{ orgSlug: string }>;
 }) {
-  const { orgSlug } = use(params);
+  return (
+    <Suspense fallback={<ProtectedShellSkeleton />}>
+      <OrganizationLayoutContent params={params}>{children}</OrganizationLayoutContent>
+    </Suspense>
+  );
+}
+
+async function OrganizationLayoutContent({
+  children,
+  params,
+}: {
+  children: React.ReactNode;
+  params: Promise<{ orgSlug: string }>;
+}) {
+  const { orgSlug } = await params;
 
   return (
     <WorkspaceSidebarLayout kind="organization" orgSlug={orgSlug}>

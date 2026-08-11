@@ -11,7 +11,6 @@ import Link from "next/link";
 import type { Route } from "next";
 
 import UserMenu from "@/components/account/user-menu";
-import { getMockOrganization } from "@/lib/mock-workspace";
 import { WorkspaceSwitcher } from "@/components/workspace/workspace-switcher";
 import {
   Sidebar,
@@ -49,12 +48,10 @@ export function AppSidebar({
   kind: SidebarKind;
   orgSlug?: string;
 }) {
-  const organization = getMockOrganization(orgSlug);
-  const orgName = organization.name;
   const isAdmin = kind === "admin";
   const links = isAdmin ? adminLinks : organizationLinks;
   const homeHref = (isAdmin ? "/admin/overview" : `/home/${orgSlug}`) as Route;
-  const sectionLabel = isAdmin ? "Admin console" : orgName;
+  const sectionLabel = isAdmin ? "Admin console" : "Workspace";
 
   return (
     <Sidebar variant="inset">

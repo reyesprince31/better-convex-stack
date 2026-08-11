@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Orbit — the operating system for focused teams",
+    default: "Orbit: the operating system for focused teams",
     template: "%s | Orbit",
   },
   description: "A calm, collaborative workspace for teams building what matters.",
