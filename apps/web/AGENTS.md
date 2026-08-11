@@ -19,6 +19,10 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
   `home/(personal)/layout.tsx`. Organization and admin routes each own a
   synchronous sidebar layout backed by the generated shadcn sidebar
   primitives.
+- Keep workspace switching in a small client island, and keep route shells,
+  loading states, and page content separate. Add a route-local `loading.tsx`
+  when a workspace transition needs a shaped skeleton instead of the generic
+  protected fallback.
 - `src/proxy.ts` performs an optimistic cookie check for fast redirects only.
   The protected layout and `requireAdmin` helper remain the authoritative
   Better Auth/Convex checks; never rely on proxy alone for authorization.

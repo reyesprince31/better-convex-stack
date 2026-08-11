@@ -17,6 +17,7 @@ import { useParams } from "next/navigation";
 import type { Route } from "next";
 
 import UserMenu from "@/components/user-menu";
+import { WorkspaceSwitcher } from "@/components/workspace-switcher";
 import {
   Sidebar,
   SidebarContent,
@@ -70,6 +71,7 @@ export function AppSidebar({ kind }: { kind: SidebarKind }) {
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
+        {!isAdmin ? <WorkspaceSwitcher className="w-full justify-start" /> : null}
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
