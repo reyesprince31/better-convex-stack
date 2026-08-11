@@ -30,6 +30,10 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
   static navigation links can be included in the first RSC payload. Keep
   pathname, user, theme, and workspace-switching hooks inside their small
   client components (`UserMenu` and `WorkspaceSwitcher`).
+- Keep static authentication framing in the server-rendered `AuthPage`; isolate
+  only the sign-in/sign-up mode state in `AuthModeSwitcher`. Likewise, do not
+  mark a static parent client-only just because it renders a client island
+  such as `ModeToggle`, a form, or a provider.
 - The `/home/organizations` personal route lists organizations in a table and
   owns the future create-organization action. Keep `/home` itself free of a
   workspace selector.

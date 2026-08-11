@@ -1,14 +1,13 @@
-"use client";
 import Link from "next/link";
 
 import { ModeToggle } from "./mode-toggle";
 
-export default function Header() {
-  const links = [
-    { to: "/", label: "Home" },
-    { to: "/dashboard", label: "Dashboard" },
-  ] as const;
+const links = [
+  { to: "/", label: "Home" },
+  { to: "/dashboard", label: "Dashboard" },
+] as const;
 
+export default function Header() {
   return (
     <div>
       <div className="flex flex-row items-center justify-between px-2 py-1">
