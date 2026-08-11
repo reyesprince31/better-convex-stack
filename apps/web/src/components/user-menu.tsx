@@ -1,3 +1,5 @@
+"use client";
+
 import { api } from "@better-convex-stack/backend/convex/_generated/api";
 import { Button } from "@better-convex-stack/ui/components/button";
 import {
@@ -32,7 +34,7 @@ export default function UserMenu() {
               authClient.signOut({
                 fetchOptions: {
                   onSuccess: () => {
-                    router.push("/dashboard");
+                    router.push("/sign-in");
                   },
                 },
               });

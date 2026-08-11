@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@better-convex-stack/ui/components/button";
 import { Input } from "@better-convex-stack/ui/components/input";
 import { Label } from "@better-convex-stack/ui/components/label";
@@ -24,7 +26,7 @@ export default function SignInForm({ onSwitchToSignUp }: { onSwitchToSignUp: () 
         },
         {
           onSuccess: () => {
-            router.push("/dashboard");
+            router.push("/home");
             toast.success("Sign in successful");
           },
           onError: (error) => {

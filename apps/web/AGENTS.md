@@ -7,3 +7,20 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+## Route architecture
+
+- Public pages live under `src/app/(public)` and own their marketing, journal,
+  and authentication navigation. The `(public)` group does not appear in URLs.
+- Authenticated SaaS pages live under `src/app/(protected)`: `/home` is the
+  personal workspace, `/home/[orgSlug]` is an organization workspace, and
+  `/admin` is the admin console.
+- `src/proxy.ts` performs an optimistic cookie check for fast redirects only.
+  The protected layout and `requireAdmin` helper remain the authoritative
+  Better Auth/Convex checks; never rely on proxy alone for authorization.
+- Keep `cacheComponents` and `partialPrefetching` enabled in `next.config.ts`.
+  Prefer `loading.tsx`, `Suspense`, `use cache`, and prefetched `Link`s for
+  instant navigation. `export const instant = false` is an explicit last
+  resort, not a default route setting.
+- Keep route pages as Server Components unless an interaction requires a
+  client island. Do not add `memo` or `useMemo` without profiling evidence.

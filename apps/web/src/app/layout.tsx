@@ -3,9 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 
 import "../index.css";
 
-import Header from "@/components/header";
 import Providers from "@/components/providers";
-import { getToken } from "@/lib/auth-server";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,8 +16,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "better-convex-stack",
-  description: "better-convex-stack",
+  title: {
+    default: "Orbit — the operating system for focused teams",
+    template: "%s | Orbit",
+  },
+  description: "A calm, collaborative workspace for teams building what matters.",
 };
 
 export default async function RootLayout({
@@ -27,16 +28,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const token = await getToken();
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <Providers initialToken={token}>
-          <div className="grid grid-rows-[auto_1fr] h-svh">
-            <Header />
-            {children}
-          </div>
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
