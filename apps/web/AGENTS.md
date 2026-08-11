@@ -26,6 +26,10 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Mock workspace data lives in `src/lib/mock-workspace.ts`. Keep pages,
   navigation, and resource views consuming that typed boundary so Convex
   queries can replace the loaders later without reshaping the UI.
+- The account menu derives admin navigation from the Better Auth user role:
+  show the admin console link only for `role === "admin"`, and show a Home
+  link while inside `/admin`. This is navigation affordance only; the server
+  `requireAdmin` guard remains authoritative.
 - `src/proxy.ts` performs an optimistic cookie check for fast redirects only.
   The protected layout and `requireAdmin` helper remain the authoritative
   Better Auth/Convex checks; never rely on proxy alone for authorization.

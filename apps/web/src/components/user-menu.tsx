@@ -12,15 +12,23 @@ import {
   DropdownMenuTrigger,
 } from "@better-convex-stack/ui/components/dropdown-menu";
 import { useQuery } from "convex/react";
-import { ChevronDown, LogOut, Settings2 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { ChevronDown, Home, LogOut, Settings2, ShieldCheck } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import type { Route } from "next";
 
 import { authClient } from "@/lib/auth-client";
 
 export default function UserMenu() {
-  const router = useRouter();
+  const pathname = usePathname();
   const user = useQuery(api.auth.getCurrentUser);
   const displayName = user?.name?.trim() || user?.email?.split("@")[0] || "Account";
+  const isAdminPanel = pathname === "/admin" || pathname.startsWith("/admin/");
+  const contextLink = isAdminPanel
+    ? { href: "/home" as Route, label: "Home", icon: Home }
+    : user?.role === "admin"
+      ? { href: "/admin/overview" as Route, label: "Admin console", icon: ShieldCheck }
+      : null;
   const initials = displayName
     .split(/\s+/)
     .map((part) => part[0])
@@ -49,7 +57,16 @@ export default function UserMenu() {
           </DropdownMenuLabel>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => router.push("/home/settings")}>
+        {contextLink ? (
+          <>
+            <DropdownMenuItem render={<Link href={contextLink.href} />}>
+              <contextLink.icon />
+              {contextLink.label}
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </>
+        ) : null}
+        <DropdownMenuItem render={<Link href="/home/settings" />}>
           <Settings2 />
           Account settings
         </DropdownMenuItem>
@@ -60,7 +77,7 @@ export default function UserMenu() {
             authClient.signOut({
               fetchOptions: {
                 onSuccess: () => {
-                  router.replace("/sign-in");
+                  window.location.replace("/sign-in");
                 },
               },
             });
