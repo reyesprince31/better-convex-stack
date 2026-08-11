@@ -23,14 +23,14 @@ export default function PersonalHomePage() {
           const Icon = index === 0 ? CircleDot : index === 1 ? Clock3 : Check;
 
           return (
-          <div key={label} className="border border-border/70 bg-background p-5">
-            <div className="flex items-center justify-between">
-              <p className="font-mono text-[10px] tracking-[0.16em] text-muted-foreground uppercase">{label}</p>
-              <Icon className={`size-4 ${tone}`} strokeWidth={1.5} />
+            <div key={label} className="border border-border/70 bg-background p-5">
+              <div className="flex items-center justify-between">
+                <p className="font-mono text-[10px] tracking-[0.16em] text-muted-foreground uppercase">{label}</p>
+                <Icon className={`size-4 ${tone}`} strokeWidth={1.5} />
+              </div>
+              <p className="mt-8 text-4xl font-medium tracking-[-0.07em]">{value}</p>
+              <p className="mt-2 text-xs text-muted-foreground">{note}</p>
             </div>
-            <p className="mt-8 text-4xl font-medium tracking-[-0.07em]">{value}</p>
-            <p className="mt-2 text-xs text-muted-foreground">{note}</p>
-          </div>
           );
         })}
       </section>
@@ -68,7 +68,7 @@ export default function PersonalHomePage() {
             <p className="font-mono text-[10px] tracking-[0.16em] text-background/55 uppercase">Small ritual</p>
             <Plus className="size-4 text-background/55" />
           </div>
-          <h2 className="mt-16 max-w-xs text-2xl font-medium leading-tight tracking-[-0.05em]">{workspace.ritual.title}</h2>
+          <h2 className="mt-16 max-w-xs text-2xl font-medium leading-tight tracking-tighter">{workspace.ritual.title}</h2>
           <p className="mt-4 max-w-xs text-xs leading-6 text-background/55">{workspace.ritual.description}</p>
           <div className="mt-10 border-t border-background/20 pt-4 font-mono text-[10px] text-background/55">2 minutes / no ceremony</div>
         </div>

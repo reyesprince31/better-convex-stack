@@ -26,7 +26,7 @@ export default function OrganizationsPage() {
       </section>
 
       <div className="overflow-x-auto border border-border/70 bg-background">
-        <table className="w-full min-w-[40rem] text-left text-sm">
+        <table className="w-full min-w-160 text-left text-sm">
           <caption className="sr-only">Organizations connected to your account</caption>
           <thead className="border-b border-border/70 bg-muted/30">
             <tr>
