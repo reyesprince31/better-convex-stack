@@ -1,0 +1,32 @@
+{
+  "name": "better-convex-stack",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "type": "module",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "check-types": "turbo run check-types",
+    "dev:web": "turbo run dev -F web",
+    "dev:server": "turbo run dev -F @better-convex-stack/backend",
+    "dev:setup": "turbo run dev:setup -F @better-convex-stack/backend",
+    "check": "oxlint && oxfmt --write"
+  },
+  "dependencies": {
+    "@better-convex-stack/env": "workspace:*",
+    "dotenv": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@better-convex-stack/config": "workspace:*",
+    "@types/node": "^22.20.1",
+    "oxfmt": "^0.61.0",
+    "oxlint": "^1.76.0",
+    "turbo": "^2.10.7",
+    "typescript": "catalog:"
+  },
+  "packageManager": "pnpm@10.23.0"
+}

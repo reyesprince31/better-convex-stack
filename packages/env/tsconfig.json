@@ -1,0 +1,3 @@
+{
+  "extends": "@better-convex-stack/config/tsconfig.base.json"
+}
