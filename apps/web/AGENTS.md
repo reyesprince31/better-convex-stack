@@ -26,8 +26,9 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - `WorkspaceSwitcher` is the dedicated workspace-navigation control for the
   organization sidebar header. Keep the account menu focused on identity,
   appearance, account navigation, and sign-out.
-- The `/home` personal header uses `OrganizationMenu` to list all
-  organizations; do not add the full workspace switcher to that route.
+- The `/home/organizations` personal route lists organizations in a table and
+  owns the future create-organization action. Keep `/home` itself free of a
+  workspace selector.
 - Mock workspace data lives in `src/lib/mock-workspace.ts`. Keep pages,
   navigation, and resource views consuming that typed boundary so Convex
   queries can replace the loaders later without reshaping the UI.

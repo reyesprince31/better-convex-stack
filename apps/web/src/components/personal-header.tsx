@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-import { OrganizationMenu } from "@/components/organization-menu";
 import UserMenu from "@/components/user-menu";
 
 export function PersonalHeader() {
@@ -27,7 +26,9 @@ export function PersonalHeader() {
             <Link href="/home" className="transition-colors hover:text-foreground">
               Overview
             </Link>
-            <OrganizationMenu />
+            <Link href="/home/organizations" className="transition-colors hover:text-foreground">
+              Organizations
+            </Link>
             <Link href="/home/settings" className="transition-colors hover:text-foreground">
               Settings
             </Link>
