@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import UserMenu from "@/components/user-menu";
+import { WorkspaceSwitcher } from "@/components/workspace-switcher";
 
 export function PersonalHeader() {
   return (
@@ -35,6 +36,7 @@ export function PersonalHeader() {
           </nav>
         </div>
         <div className="flex items-center gap-2">
+          <WorkspaceSwitcher compact />
           <UserMenu />
         </div>
       </div>

@@ -15,6 +15,7 @@ import type { Route } from "next";
 
 import UserMenu from "@/components/user-menu";
 import { getMockOrganization } from "@/lib/mock-workspace";
+import { WorkspaceSwitcher } from "@/components/workspace-switcher";
 import {
   Sidebar,
   SidebarContent,
@@ -57,19 +58,23 @@ export function AppSidebar({ kind }: { kind: SidebarKind }) {
   return (
     <Sidebar variant="inset">
       <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton size="lg" render={<Link href={homeHref} />}>
-              <div className="flex aspect-square size-8 items-center justify-center bg-sidebar-primary text-sidebar-primary-foreground">
-                {isAdmin ? <ShieldCheck className="size-4" /> : <Building2 className="size-4" />}
-              </div>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{sectionLabel}</span>
-                <span className="truncate text-xs text-muted-foreground">Orbit workspace</span>
-              </div>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+        {isAdmin ? (
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton size="lg" render={<Link href={homeHref} />}>
+                <div className="flex aspect-square size-8 items-center justify-center bg-sidebar-primary text-sidebar-primary-foreground">
+                  <ShieldCheck className="size-4" />
+                </div>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-medium">{sectionLabel}</span>
+                  <span className="truncate text-xs text-muted-foreground">Orbit workspace</span>
+                </div>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        ) : (
+          <WorkspaceSwitcher side="right" />
+        )}
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>

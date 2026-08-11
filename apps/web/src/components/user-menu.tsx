@@ -30,7 +30,6 @@ import type { Route } from "next";
 import { useTheme } from "next-themes";
 
 import { authClient } from "@/lib/auth-client";
-import { workspaceOptions } from "@/components/workspace-switcher";
 
 const themeOptions = [
   { value: "light", label: "Light", icon: Sun },
@@ -97,32 +96,6 @@ export default function UserMenu() {
             <p className="font-medium text-foreground">{displayName}</p>
             <p className="mt-1 truncate text-[11px]">{user?.email ?? "Signed-in account"}</p>
           </DropdownMenuLabel>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuLabel>Workspace</DropdownMenuLabel>
-          {workspaceOptions.map((workspace) => {
-            const Icon = workspace.icon;
-            const isCurrent =
-              workspace.href === "/home"
-                ? pathname === workspace.href
-                : pathname === workspace.href || pathname.startsWith(`${workspace.href}/`);
-
-            return (
-              <DropdownMenuItem
-                key={workspace.href}
-                render={<Link href={workspace.href as Route} />}
-                className="gap-3 py-2.5"
-              >
-                <Icon className="size-4 text-muted-foreground" />
-                <span className="grid flex-1 text-left">
-                  <span className="text-xs font-medium">{workspace.label}</span>
-                  <span className="text-[10px] text-muted-foreground">{workspace.detail}</span>
-                </span>
-                {isCurrent ? <Check className="size-3.5 text-emerald-500" /> : null}
-              </DropdownMenuItem>
-            );
-          })}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>

@@ -23,8 +23,10 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
   loading states, and page content separate. Add a route-local `loading.tsx`
   when a workspace transition needs a shaped skeleton instead of the generic
   protected fallback.
-- The protected account menu owns workspace switching and appearance selection;
-  keep those controls out of the personal header and route sidebar duplicates.
+- `WorkspaceSwitcher` is the dedicated workspace-navigation control: place it
+  in the organization sidebar header and beside the personal header account
+  menu. Keep the account menu focused on identity, appearance, account
+  navigation, and sign-out.
 - Mock workspace data lives in `src/lib/mock-workspace.ts`. Keep pages,
   navigation, and resource views consuming that typed boundary so Convex
   queries can replace the loaders later without reshaping the UI.
