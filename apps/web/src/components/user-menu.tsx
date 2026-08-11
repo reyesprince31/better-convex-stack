@@ -37,7 +37,7 @@ const themeOptions = [
   { value: "system", label: "System", icon: Monitor },
 ] as const;
 
-export default function UserMenu() {
+export default function UserMenu({ compact = false }: { compact?: boolean } = {}) {
   const pathname = usePathname();
   const user = useQuery(api.auth.getCurrentUser);
   const { setTheme, theme } = useTheme();
@@ -45,14 +45,17 @@ export default function UserMenu() {
   if (!user) {
     return (
       <Button
-        variant="outline"
-        size="sm"
-        className="h-9 gap-2 px-2"
+        variant={compact ? "outline" : "ghost"}
+        size={compact ? "sm" : "lg"}
+        className={`group ${compact ? "h-9 w-auto" : "h-12 w-full"} justify-start gap-3 px-2`}
         disabled
         aria-label="Loading account"
       >
-        <Skeleton className="size-6 rounded-full" />
-        <Skeleton className="hidden h-3 w-14 sm:block" />
+        <Skeleton className={`${compact ? "size-6" : "size-8"} rounded-full`} />
+        <span className="grid min-w-0 flex-1 gap-1 text-left">
+          <Skeleton className="h-3 w-16" />
+          {!compact ? <Skeleton className="h-2.5 w-24" /> : null}
+        </span>
         <ChevronDown className="size-3.5 text-muted-foreground" />
       </Button>
     );
@@ -77,20 +80,33 @@ export default function UserMenu() {
       <DropdownMenuTrigger
         render={
           <Button
-            variant="outline"
-            size="sm"
-            className="h-9 gap-2 px-2"
+            variant={compact ? "outline" : "ghost"}
+            size={compact ? "sm" : "lg"}
+            className={`group ${compact ? "h-9 w-auto" : "h-12 w-full"} justify-start gap-3 px-2`}
             aria-label="Open account menu"
           />
         }
       >
-        <span className="flex size-6 items-center justify-center rounded-full bg-foreground text-[10px] font-medium text-background">
+        <span
+          className={`${compact ? "size-6" : "size-8"} flex shrink-0 items-center justify-center rounded-full bg-foreground text-[10px] font-medium text-background`}
+        >
           {initials}
         </span>
-        <span className="hidden max-w-24 truncate text-xs sm:inline">{displayName}</span>
-        <ChevronDown className="size-3.5 text-muted-foreground" />
+        <span className="grid min-w-0 flex-1 text-left leading-tight">
+          <span className="max-w-28 truncate text-xs font-medium">{displayName}</span>
+          {!compact ? (
+            <span className="max-w-36 truncate text-[10px] text-muted-foreground">
+              {user?.email ?? "Signed-in account"}
+            </span>
+          ) : null}
+        </span>
+        <ChevronDown className="size-3.5 shrink-0 text-muted-foreground transition-transform group-data-popup-open:rotate-180" />
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-64">
+      <DropdownMenuContent
+        align={compact ? "end" : "start"}
+        side={compact ? "bottom" : "top"}
+        className="w-64"
+      >
         <DropdownMenuGroup>
           <DropdownMenuLabel className="py-3">
             <p className="font-medium text-foreground">{displayName}</p>

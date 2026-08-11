@@ -1,7 +1,7 @@
 import Link from "next/link";
 
+import { OrganizationMenu } from "@/components/organization-menu";
 import UserMenu from "@/components/user-menu";
-import { WorkspaceSwitcher } from "@/components/workspace-switcher";
 
 export function PersonalHeader() {
   return (
@@ -27,17 +27,14 @@ export function PersonalHeader() {
             <Link href="/home" className="transition-colors hover:text-foreground">
               Overview
             </Link>
-            <Link href="/home/acme-labs" className="transition-colors hover:text-foreground">
-              Acme Labs
-            </Link>
+            <OrganizationMenu />
             <Link href="/home/settings" className="transition-colors hover:text-foreground">
               Settings
             </Link>
           </nav>
         </div>
         <div className="flex items-center gap-2">
-          <WorkspaceSwitcher compact />
-          <UserMenu />
+          <UserMenu compact />
         </div>
       </div>
     </header>
