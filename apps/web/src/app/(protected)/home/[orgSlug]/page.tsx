@@ -1,5 +1,6 @@
 import { ArrowUpRight, Check, CircleDot, Users } from "lucide-react";
 import Link from "next/link";
+import { use } from "react";
 
 const organizations = ["acme-labs", "northstar"] as const;
 
@@ -7,8 +8,8 @@ export function generateStaticParams() {
   return organizations.map((orgSlug) => ({ orgSlug }));
 }
 
-export default async function OrganizationHomePage({ params }: { params: Promise<{ orgSlug: string }> }) {
-  const { orgSlug } = await params;
+export default function OrganizationHomePage({ params }: { params: Promise<{ orgSlug: string }> }) {
+  const { orgSlug } = use(params);
   const organizationName = orgSlug === "northstar" ? "Northstar" : "Acme Labs";
 
   return (

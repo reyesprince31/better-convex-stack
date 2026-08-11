@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import type { Route } from "next";
 
 import UserMenu from "@/components/user-menu";
 import {
@@ -32,16 +33,16 @@ import {
 type SidebarKind = "admin" | "organization";
 
 const organizationLinks = [
-  { label: "Overview", icon: LayoutDashboard },
-  { label: "Projects", icon: FolderKanban },
-  { label: "People", icon: Users },
+  { label: "Overview", href: null, icon: LayoutDashboard },
+  { label: "Projects", href: null, icon: FolderKanban },
+  { label: "People", href: null, icon: Users },
 ] as const;
 
 const adminLinks = [
-  { label: "Overview", icon: LayoutDashboard },
-  { label: "Members", icon: Users },
-  { label: "Organizations", icon: Building2 },
-  { label: "Activity", icon: Activity },
+  { label: "Overview", href: "/admin/overview", icon: LayoutDashboard },
+  { label: "Members", href: "/admin/users", icon: Users },
+  { label: "Organizations", href: "/admin/organizations", icon: Building2 },
+  { label: "Activity", href: "/admin/subscriptions", icon: Activity },
 ] as const;
 
 export function AppSidebar({ kind }: { kind: SidebarKind }) {
@@ -50,7 +51,7 @@ export function AppSidebar({ kind }: { kind: SidebarKind }) {
   const orgName = orgSlug === "northstar" ? "Northstar" : "Acme Labs";
   const isAdmin = kind === "admin";
   const links = isAdmin ? adminLinks : organizationLinks;
-  const homeHref = isAdmin ? "/admin" : `/home/${orgSlug}`;
+  const homeHref = (isAdmin ? "/admin/overview" : `/home/${orgSlug}`) as Route;
   const sectionLabel = isAdmin ? "Admin console" : orgName;
 
   return (
@@ -58,7 +59,7 @@ export function AppSidebar({ kind }: { kind: SidebarKind }) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" render={<Link href={homeHref as `/admin` | `/home/${string}`} />}>
+            <SidebarMenuButton size="lg" render={<Link href={homeHref} />}>
               <div className="flex aspect-square size-8 items-center justify-center bg-sidebar-primary text-sidebar-primary-foreground">
                 {isAdmin ? <ShieldCheck className="size-4" /> : <Building2 className="size-4" />}
               </div>
@@ -75,17 +76,21 @@ export function AppSidebar({ kind }: { kind: SidebarKind }) {
           <SidebarGroupLabel>{isAdmin ? "Control room" : "Workspace"}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {links.map(({ label, icon: Icon }) => (
+              {links.map(({ label, icon: Icon, ...item }) => {
+                const href = (isAdmin ? item.href : homeHref) as Route;
+
+                return (
                 <SidebarMenuItem key={label}>
                   <SidebarMenuButton
-                    render={<Link href={homeHref as `/admin` | `/home/${string}`} />}
+                    render={<Link href={href} />}
                     tooltip={label}
                   >
                     <Icon />
                     <span>{label}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-              ))}
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
