@@ -2,7 +2,10 @@
 
 import { env } from "@better-convex-stack/env/web";
 import { Toaster } from "@better-convex-stack/ui/components/sonner";
-import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
+import {
+  ConvexBetterAuthProvider,
+  type AuthClient,
+} from "@convex-dev/better-auth/react";
 import { ConvexReactClient } from "convex/react";
 
 import { authClient } from "@/lib/auth-client";
@@ -20,7 +23,13 @@ export default function Providers({
 }) {
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-      <ConvexBetterAuthProvider client={convex} authClient={authClient} initialToken={initialToken}>
+      <ConvexBetterAuthProvider
+        client={convex}
+        // Convex's provider type only models its core plugin set; the runtime
+        // client also includes Better Auth's organization and admin plugins.
+        authClient={authClient as unknown as AuthClient}
+        initialToken={initialToken}
+      >
         {children}
       </ConvexBetterAuthProvider>
       <Toaster richColors />
