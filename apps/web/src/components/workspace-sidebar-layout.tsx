@@ -9,14 +9,16 @@ import { AppSidebar } from "@/components/app-sidebar";
 
 export function WorkspaceSidebarLayout({
   kind,
+  orgSlug,
   children,
 }: {
   kind: "admin" | "organization";
+  orgSlug?: string;
   children: React.ReactNode;
 }) {
   return (
     <SidebarProvider className="h-svh max-h-svh min-h-0 overflow-hidden">
-      <AppSidebar kind={kind} />
+      <AppSidebar kind={kind} orgSlug={orgSlug} />
       <SidebarInset className="min-h-0 overflow-hidden">
         <header className="flex h-16 shrink-0 items-center gap-2 border-b border-border/70 bg-background/90 px-4 backdrop-blur-xl sm:px-6">
           <SidebarTrigger className="-ml-1" />

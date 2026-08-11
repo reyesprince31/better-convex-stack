@@ -26,6 +26,10 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - `WorkspaceSwitcher` is the dedicated workspace-navigation control for the
   organization sidebar header. Keep the account menu focused on identity,
   appearance, account navigation, and sign-out.
+- `AppSidebar` and `WorkspaceSidebarLayout` stay Server Components so their
+  static navigation links can be included in the first RSC payload. Keep
+  pathname, user, theme, and workspace-switching hooks inside their small
+  client components (`UserMenu` and `WorkspaceSwitcher`).
 - The `/home/organizations` personal route lists organizations in a table and
   owns the future create-organization action. Keep `/home` itself free of a
   workspace selector.

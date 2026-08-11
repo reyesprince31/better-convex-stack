@@ -1,5 +1,3 @@
-"use client";
-
 import {
   Activity,
   Building2,
@@ -10,7 +8,6 @@ import {
   Users,
 } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
 import type { Route } from "next";
 
 import UserMenu from "@/components/user-menu";
@@ -45,9 +42,13 @@ const adminLinks = [
   { label: "Activity", path: "/admin/subscriptions", icon: Activity },
 ] as const;
 
-export function AppSidebar({ kind }: { kind: SidebarKind }) {
-  const params = useParams<{ orgSlug?: string }>();
-  const orgSlug = params?.orgSlug ?? "acme-labs";
+export function AppSidebar({
+  kind,
+  orgSlug = "acme-labs",
+}: {
+  kind: SidebarKind;
+  orgSlug?: string;
+}) {
   const organization = getMockOrganization(orgSlug);
   const orgName = organization.name;
   const isAdmin = kind === "admin";
