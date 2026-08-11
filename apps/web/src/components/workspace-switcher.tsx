@@ -45,9 +45,8 @@ export function WorkspaceSwitcher({ className }: { className?: string } = {}) {
         <span className="sr-only">Switch workspace</span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-64">
-        <DropdownMenuLabel>Switch workspace</DropdownMenuLabel>
-        <DropdownMenuSeparator />
         <DropdownMenuGroup>
+          <DropdownMenuLabel>Switch workspace</DropdownMenuLabel>
           {workspaces.map((workspace) => {
             const Icon = workspace.icon;
             const isCurrent = workspace.href === current.href;
@@ -68,6 +67,7 @@ export function WorkspaceSwitcher({ className }: { className?: string } = {}) {
             );
           })}
         </DropdownMenuGroup>
+        <DropdownMenuSeparator />
       </DropdownMenuContent>
     </DropdownMenu>
   );
