@@ -1,6 +1,8 @@
 import { Activity, ArrowUpRight, ShieldCheck, Users } from "lucide-react";
 import Link from "next/link";
 
+import { mockAdminStats } from "@/lib/mock-workspace";
+
 export default function AdminOverviewPage() {
   return (
     <div className="space-y-10">
@@ -19,7 +21,11 @@ export default function AdminOverviewPage() {
         <p className="mt-2 text-xs text-muted-foreground">This surface is protected by the Better Auth admin plugin.</p>
       </div>
       <section className="grid gap-4 md:grid-cols-3">
-        {[{ label: "Active members", value: "48", icon: Users }, { label: "Organizations", value: "06", icon: ShieldCheck }, { label: "System health", value: "99.9%", icon: Activity }].map(({ label, value, icon: Icon }) => (
+        {[
+          { label: "Active members", value: String(mockAdminStats.activeMembers), icon: Users },
+          { label: "Organizations", value: String(mockAdminStats.organizations).padStart(2, "0"), icon: ShieldCheck },
+          { label: "System health", value: mockAdminStats.systemHealth, icon: Activity },
+        ].map(({ label, value, icon: Icon }) => (
           <div key={label} className="border border-border/70 bg-background p-5">
             <Icon className="size-4 text-muted-foreground" strokeWidth={1.5} />
             <p className="mt-8 text-4xl font-medium tracking-[-0.07em]">{value}</p>

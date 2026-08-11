@@ -18,6 +18,7 @@ import type { Route } from "next";
 
 import UserMenu from "@/components/user-menu";
 import { WorkspaceSwitcher } from "@/components/workspace-switcher";
+import { getMockOrganization } from "@/lib/mock-workspace";
 import {
   Sidebar,
   SidebarContent,
@@ -34,22 +35,23 @@ import {
 type SidebarKind = "admin" | "organization";
 
 const organizationLinks = [
-  { label: "Overview", href: null, icon: LayoutDashboard },
-  { label: "Projects", href: null, icon: FolderKanban },
-  { label: "People", href: null, icon: Users },
+  { label: "Overview", path: "", icon: LayoutDashboard },
+  { label: "Projects", path: "/projects", icon: FolderKanban },
+  { label: "People", path: "/members", icon: Users },
 ] as const;
 
 const adminLinks = [
-  { label: "Overview", href: "/admin/overview", icon: LayoutDashboard },
-  { label: "Members", href: "/admin/users", icon: Users },
-  { label: "Organizations", href: "/admin/organizations", icon: Building2 },
-  { label: "Activity", href: "/admin/subscriptions", icon: Activity },
+  { label: "Overview", path: "/admin/overview", icon: LayoutDashboard },
+  { label: "Members", path: "/admin/users", icon: Users },
+  { label: "Organizations", path: "/admin/organizations", icon: Building2 },
+  { label: "Activity", path: "/admin/subscriptions", icon: Activity },
 ] as const;
 
 export function AppSidebar({ kind }: { kind: SidebarKind }) {
   const params = useParams<{ orgSlug?: string }>();
   const orgSlug = params?.orgSlug ?? "acme-labs";
-  const orgName = orgSlug === "northstar" ? "Northstar" : "Acme Labs";
+  const organization = getMockOrganization(orgSlug);
+  const orgName = organization.name;
   const isAdmin = kind === "admin";
   const links = isAdmin ? adminLinks : organizationLinks;
   const homeHref = (isAdmin ? "/admin/overview" : `/home/${orgSlug}`) as Route;
@@ -79,7 +81,7 @@ export function AppSidebar({ kind }: { kind: SidebarKind }) {
           <SidebarGroupContent>
             <SidebarMenu>
               {links.map(({ label, icon: Icon, ...item }) => {
-                const href = (isAdmin ? item.href : homeHref) as Route;
+                const href = (isAdmin ? item.path : `/home/${orgSlug}${item.path}`) as Route;
 
                 return (
                 <SidebarMenuItem key={label}>
@@ -114,7 +116,7 @@ export function AppSidebar({ kind }: { kind: SidebarKind }) {
               </SidebarMenuItem>
               {!isAdmin ? (
                 <SidebarMenuItem>
-                  <SidebarMenuButton render={<Link href="/home/settings" />} tooltip="Settings">
+                  <SidebarMenuButton render={<Link href={`/home/${orgSlug}/settings` as Route} />} tooltip="Settings">
                     <Settings2 />
                     <span>Settings</span>
                   </SidebarMenuButton>

@@ -23,6 +23,9 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
   loading states, and page content separate. Add a route-local `loading.tsx`
   when a workspace transition needs a shaped skeleton instead of the generic
   protected fallback.
+- Mock workspace data lives in `src/lib/mock-workspace.ts`. Keep pages,
+  navigation, and resource views consuming that typed boundary so Convex
+  queries can replace the loaders later without reshaping the UI.
 - `src/proxy.ts` performs an optimistic cookie check for fast redirects only.
   The protected layout and `requireAdmin` helper remain the authoritative
   Better Auth/Convex checks; never rely on proxy alone for authorization.

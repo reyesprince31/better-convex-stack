@@ -14,10 +14,16 @@ import { Building2, Check, ChevronDown, CircleUserRound } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import type { Route } from "next";
 
+import { mockOrganizations } from "@/lib/mock-workspace";
+
 const workspaces = [
   { href: "/home", label: "Personal", detail: "Your private workspace", icon: CircleUserRound },
-  { href: "/home/acme-labs", label: "Acme Labs", detail: "18 members", icon: Building2 },
-  { href: "/home/northstar", label: "Northstar", detail: "7 members", icon: Building2 },
+  ...mockOrganizations.map((organization) => ({
+    href: `/home/${organization.slug}`,
+    label: organization.name,
+    detail: `${organization.memberCount} members / ${organization.plan}`,
+    icon: Building2,
+  })),
 ] as const;
 
 export function WorkspaceSwitcher({ className }: { className?: string } = {}) {
