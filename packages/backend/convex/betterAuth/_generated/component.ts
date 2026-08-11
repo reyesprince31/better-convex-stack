@@ -1510,4 +1510,74 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
         Name
       >;
     };
+    admin: {
+      deleteMember: FunctionReference<
+        "mutation",
+        "internal",
+        { memberId: string },
+        { id: string },
+        Name
+      >;
+      deleteOrganization: FunctionReference<
+        "mutation",
+        "internal",
+        { organizationId: string },
+        { id: string },
+        Name
+      >;
+      deleteUserMemberships: FunctionReference<
+        "mutation",
+        "internal",
+        { userId: string },
+        { count: number },
+        Name
+      >;
+      listMembers: FunctionReference<
+        "query",
+        "internal",
+        { limit: number; organizationId?: string },
+        Array<{
+          createdAt: number;
+          id: string;
+          organizationId: string;
+          role: string;
+          userId: string;
+        }>,
+        Name
+      >;
+      listOrganizations: FunctionReference<
+        "query",
+        "internal",
+        { limit: number },
+        Array<{
+          createdAt: number;
+          id: string;
+          memberCount: number;
+          name: string;
+          ownerUserId: string | null;
+          slug: string;
+        }>,
+        Name
+      >;
+      updateMemberRole: FunctionReference<
+        "mutation",
+        "internal",
+        { memberId: string; role: string },
+        {
+          createdAt: number;
+          id: string;
+          organizationId: string;
+          role: string;
+          userId: string;
+        },
+        Name
+      >;
+      updateOrganization: FunctionReference<
+        "mutation",
+        "internal",
+        { name: string; organizationId: string; slug: string },
+        { id: string; name: string; slug: string },
+        Name
+      >;
+    };
   };

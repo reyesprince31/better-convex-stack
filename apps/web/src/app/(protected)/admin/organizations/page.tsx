@@ -1,8 +1,5 @@
-import { Building2 } from "lucide-react";
-
-import { AdminResourcePage } from "@/components/admin/admin-resource-page";
-import { mockAdminResources } from "@/lib/mock-workspace";
+import { AdminOrganizationsManagement } from "@/components/admin/admin-organizations-management";
 
 export default function AdminOrganizationsPage() {
-  return <AdminResourcePage title="Organizations" description="Keep a clear view of every team workspace." icon={Building2} rows={mockAdminResources.organizations} />;
+  return <AdminOrganizationsManagement />;
 }
