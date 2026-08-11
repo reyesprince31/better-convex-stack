@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 
-import { ProtectedShellSkeleton, SaaSShell } from "@/components/saas-shell";
+import { ProtectedShellSkeleton } from "@/components/workspace-sidebar-layout";
 import { requireAuth } from "@/lib/require-auth";
 
 export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
@@ -13,5 +13,5 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
 
 async function ProtectedContent({ children }: { children: React.ReactNode }) {
   await requireAuth();
-  return <SaaSShell>{children}</SaaSShell>;
+  return children;
 }

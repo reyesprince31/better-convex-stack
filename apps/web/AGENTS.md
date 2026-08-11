@@ -15,6 +15,10 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Authenticated SaaS pages live under `src/app/(protected)`: `/home` is the
   personal workspace, `/home/[orgSlug]` is an organization workspace, and
   `/admin` is the admin console.
+- Keep the personal route group synchronous and header-based in
+  `home/(personal)/layout.tsx`. Organization and admin routes each own a
+  synchronous sidebar layout backed by the generated shadcn sidebar
+  primitives.
 - `src/proxy.ts` performs an optimistic cookie check for fast redirects only.
   The protected layout and `requireAdmin` helper remain the authoritative
   Better Auth/Convex checks; never rely on proxy alone for authorization.

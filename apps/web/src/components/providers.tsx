@@ -2,6 +2,7 @@
 
 import { env } from "@better-convex-stack/env/web";
 import { Toaster } from "@better-convex-stack/ui/components/sonner";
+import { TooltipProvider } from "@better-convex-stack/ui/components/tooltip";
 import {
   ConvexBetterAuthProvider,
   type AuthClient,
@@ -23,15 +24,17 @@ export default function Providers({
 }) {
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-      <ConvexBetterAuthProvider
-        client={convex}
-        // Convex's provider type only models its core plugin set; the runtime
-        // client also includes Better Auth's organization and admin plugins.
-        authClient={authClient as unknown as AuthClient}
-        initialToken={initialToken}
-      >
-        {children}
-      </ConvexBetterAuthProvider>
+      <TooltipProvider>
+        <ConvexBetterAuthProvider
+          client={convex}
+          // Convex's provider type only models its core plugin set; the runtime
+          // client also includes Better Auth's organization and admin plugins.
+          authClient={authClient as unknown as AuthClient}
+          initialToken={initialToken}
+        >
+          {children}
+        </ConvexBetterAuthProvider>
+      </TooltipProvider>
       <Toaster richColors />
     </ThemeProvider>
   );
