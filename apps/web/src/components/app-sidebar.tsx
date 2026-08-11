@@ -2,10 +2,7 @@
 
 import {
   Activity,
-  ArrowLeft,
-  BookOpen,
   Building2,
-  CircleUserRound,
   FolderKanban,
   LayoutDashboard,
   Settings2,
@@ -37,6 +34,7 @@ const organizationLinks = [
   { label: "Overview", path: "", icon: LayoutDashboard },
   { label: "Projects", path: "/projects", icon: FolderKanban },
   { label: "People", path: "/members", icon: Users },
+  { label: "Settings", path: "/settings", icon: Settings2 },
 ] as const;
 
 const adminLinks = [
@@ -93,50 +91,11 @@ export function AppSidebar({ kind }: { kind: SidebarKind }) {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        {!isAdmin ? (
-          <SidebarGroup>
-            <SidebarGroupLabel>Quick links</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                <SidebarMenuItem>
-                  <SidebarMenuButton render={<Link href="/home" />} tooltip="Personal workspace">
-                    <CircleUserRound />
-                    <span>Personal workspace</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton render={<Link href="/blog" />} tooltip="Journal">
-                    <BookOpen />
-                    <span>Journal</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    render={<Link href={`/home/${orgSlug}/settings` as Route} />}
-                    tooltip="Settings"
-                  >
-                    <Settings2 />
-                    <span>Settings</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        ) : null}
       </SidebarContent>
       <SidebarFooter>
         <div className="p-1">
           <UserMenu />
         </div>
-        {!isAdmin ? (
-          <Link
-            href="/home"
-            className="flex items-center gap-2 px-2 py-2 text-xs text-sidebar-foreground/60 transition-colors hover:text-sidebar-foreground"
-          >
-            <ArrowLeft className="size-3.5" />
-            Back to personal
-          </Link>
-        ) : null}
       </SidebarFooter>
     </Sidebar>
   );
