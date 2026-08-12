@@ -219,3 +219,92 @@ export const deleteUserMemberships = mutation({
     return { count: members.length };
   },
 });
+
+const memberPreviewValidator = v.object({
+  id: v.string(),
+  userId: v.string(),
+  name: v.string(),
+  email: v.string(),
+  image: v.union(v.string(), v.null()),
+  role: v.string(),
+  initials: v.string(),
+});
+
+export const listOrganizationsMembersForUser = query({
+  args: {
+    userId: v.string(),
+    organizationIds: v.optional(v.array(v.string())),
+  },
+  returns: v.array(
+    v.object({
+      organizationId: v.string(),
+      memberCount: v.number(),
+      members: v.array(memberPreviewValidator),
+    })
+  ),
+  handler: async (ctx, args) => {
+    const userMemberships = await ctx.db
+      .query("member")
+      .withIndex("userId", (q) => q.eq("userId", args.userId))
+      .take(100);
+
+    const allowedOrgIds = new Set(userMemberships.map((m) => m.organizationId));
+    const targetOrgIds = args.organizationIds
+      ? args.organizationIds.filter((id) => allowedOrgIds.has(id))
+      : Array.from(allowedOrgIds);
+
+    const results = await Promise.all(
+      targetOrgIds.map(async (orgId) => {
+        const members = await ctx.db
+          .query("member")
+          .withIndex("organizationId", (q) => q.eq("organizationId", orgId))
+          .take(50);
+
+        const memberProfiles = await Promise.all(
+          members.slice(0, 4).map(async (member) => {
+            let user = null;
+            try {
+              user = await ctx.db.get(member.userId as Id<"user">);
+            } catch {
+              // ignore if not a direct Id
+            }
+            if (!user) {
+              user = await ctx.db
+                .query("user")
+                .withIndex("userId", (q) => q.eq("userId", member.userId))
+                .first();
+            }
+
+            const name = user?.name || "Member";
+            const email = user?.email || "";
+            const image = user?.image ?? null;
+
+            const parts = name.trim().split(/\s+/).filter(Boolean);
+            const initials =
+              parts.length >= 2
+                ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+                : name.trim().slice(0, 2).toUpperCase() || "MB";
+
+            return {
+              id: String(member._id),
+              userId: member.userId,
+              name,
+              email,
+              image,
+              role: member.role,
+              initials,
+            };
+          })
+        );
+
+        return {
+          organizationId: orgId,
+          memberCount: members.length,
+          members: memberProfiles,
+        };
+      })
+    );
+
+    return results;
+  },
+});

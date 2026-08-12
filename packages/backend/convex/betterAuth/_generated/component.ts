@@ -1559,6 +1559,25 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
         }>,
         Name
       >;
+      listOrganizationsMembersForUser: FunctionReference<
+        "query",
+        "internal",
+        { organizationIds?: Array<string>; userId: string },
+        Array<{
+          memberCount: number;
+          members: Array<{
+            email: string;
+            id: string;
+            image: string | null;
+            initials: string;
+            name: string;
+            role: string;
+            userId: string;
+          }>;
+          organizationId: string;
+        }>,
+        Name
+      >;
       updateMemberRole: FunctionReference<
         "mutation",
         "internal",
