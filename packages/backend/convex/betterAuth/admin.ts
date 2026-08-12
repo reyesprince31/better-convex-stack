@@ -1,6 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 
 const organizationSummary = v.object({
   id: v.string(),
@@ -18,6 +18,12 @@ const memberSummary = v.object({
   role: v.string(),
   createdAt: v.number(),
 });
+
+const organizationRoleValidator = v.union(
+  v.literal("owner"),
+  v.literal("admin"),
+  v.literal("member"),
+);
 
 export const listOrganizations = query({
   args: { limit: v.number() },
@@ -115,7 +121,13 @@ export const deleteOrganization = mutation({
     const members = await ctx.db
       .query("member")
       .withIndex("organizationId", (q) => q.eq("organizationId", String(organization._id)))
-      .take(500);
+      .take(501);
+    if (members.length > 500) {
+      throw new ConvexError({
+        code: "BULK_OPERATION_REQUIRED",
+        message: "This organization is too large for inline deletion. Contact support.",
+      });
+    }
     for (const member of members) {
       await ctx.db.delete(member._id);
     }
@@ -123,7 +135,13 @@ export const deleteOrganization = mutation({
     const invitations = await ctx.db
       .query("invitation")
       .withIndex("organizationId", (q) => q.eq("organizationId", String(organization._id)))
-      .take(500);
+      .take(501);
+    if (invitations.length > 500) {
+      throw new ConvexError({
+        code: "BULK_OPERATION_REQUIRED",
+        message: "This organization has too many invitations for inline deletion. Contact support.",
+      });
+    }
     for (const invitation of invitations) {
       await ctx.db.delete(invitation._id);
     }
@@ -136,7 +154,7 @@ export const deleteOrganization = mutation({
 export const updateMemberRole = mutation({
   args: {
     memberId: v.string(),
-    role: v.string(),
+    role: organizationRoleValidator,
   },
   returns: memberSummary,
   handler: async (ctx, args) => {
@@ -201,7 +219,14 @@ export const deleteUserMemberships = mutation({
     const members = await ctx.db
       .query("member")
       .withIndex("userId", (q) => q.eq("userId", args.userId))
-      .take(500);
+      .take(501);
+
+    if (members.length > 500) {
+      throw new ConvexError({
+        code: "BULK_OPERATION_REQUIRED",
+        message: "This account has too many memberships for inline deletion. Contact support.",
+      });
+    }
 
     for (const member of members) {
       if (member.role.split(",").includes("owner")) {
@@ -233,14 +258,13 @@ const memberPreviewValidator = v.object({
 export const listOrganizationsMembersForUser = query({
   args: {
     userId: v.string(),
-    organizationIds: v.optional(v.array(v.string())),
   },
   returns: v.array(
     v.object({
       organizationId: v.string(),
       memberCount: v.number(),
       members: v.array(memberPreviewValidator),
-    })
+    }),
   ),
   handler: async (ctx, args) => {
     const userMemberships = await ctx.db
@@ -248,10 +272,9 @@ export const listOrganizationsMembersForUser = query({
       .withIndex("userId", (q) => q.eq("userId", args.userId))
       .take(100);
 
-    const allowedOrgIds = new Set(userMemberships.map((m) => m.organizationId));
-    const targetOrgIds = args.organizationIds
-      ? args.organizationIds.filter((id) => allowedOrgIds.has(id))
-      : Array.from(allowedOrgIds);
+    const targetOrgIds = Array.from(
+      new Set(userMemberships.map((membership) => membership.organizationId)),
+    );
 
     const results = await Promise.all(
       targetOrgIds.map(async (orgId) => {
@@ -294,7 +317,7 @@ export const listOrganizationsMembersForUser = query({
               role: member.role,
               initials,
             };
-          })
+          }),
         );
 
         return {
@@ -302,7 +325,7 @@ export const listOrganizationsMembersForUser = query({
           memberCount: members.length,
           members: memberProfiles,
         };
-      })
+      }),
     );
 
     return results;

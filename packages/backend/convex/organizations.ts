@@ -51,11 +51,9 @@ function toTimestamp(value: unknown) {
 }
 
 export const getMyOrganizationsMembers = query({
-  args: {
-    organizationIds: v.optional(v.array(v.string())),
-  },
+  args: {},
   returns: v.array(organizationMemberSummaryValidator),
-  handler: async (ctx, args) => {
+  handler: async (ctx) => {
     const user = await authComponent.safeGetAuthUser(ctx);
     if (!user) {
       return [];
@@ -63,7 +61,6 @@ export const getMyOrganizationsMembers = query({
 
     return await ctx.runQuery(components.betterAuth.admin.listOrganizationsMembersForUser, {
       userId: String(user._id),
-      organizationIds: args.organizationIds,
     });
   },
 });
@@ -73,13 +70,11 @@ export const listMyInvitations = query({
   returns: v.array(invitationSummaryValidator),
   handler: async (ctx) => {
     const user = await authComponent.safeGetAuthUser(ctx);
-    if (!user) {
+    if (!user || !user.emailVerified) {
       return [];
     }
 
-    // The email comes from the authenticated Convex user, never from client input.
-    // Keep this server-only lookup independent from the session headers so accounts
-    // that are allowed to sign in before email verification can still see invites.
+    // The email comes from a verified authenticated user, never from client input.
     const invitations = await createAuth(ctx).api.listUserInvitations({
       query: { email: user.email },
     });

@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@better-convex-stack/ui/components/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@better-convex-stack/ui/components/avatar";
 import { Button } from "@better-convex-stack/ui/components/button";
 import {
   Empty,
@@ -34,10 +30,12 @@ export function OrganizationOverview({ orgSlug }: { orgSlug: string }) {
 
   const convexMembersSummary = useQuery(
     api.organizations.getMyOrganizationsMembers,
-    organization?.id ? { organizationIds: [organization.id] } : "skip"
+    organization?.id ? {} : "skip",
   );
 
-  const convexOrgData = convexMembersSummary?.[0];
+  const convexOrgData = convexMembersSummary?.find(
+    (summary) => summary.organizationId === organization?.id,
+  );
 
   useEffect(() => {
     if (
@@ -57,7 +55,10 @@ export function OrganizationOverview({ orgSlug }: { orgSlug: string }) {
       });
   }, [activeOrganizationQuery.data?.id, activeOrganizationQuery.isPending, organization]);
 
-  if (organizationsQuery.isPending || (organization && activeOrganizationQuery.isPending && !convexOrgData)) {
+  if (
+    organizationsQuery.isPending ||
+    (organization && activeOrganizationQuery.isPending && !convexOrgData)
+  ) {
     return (
       <div className="space-y-8" aria-label="Loading organization workspace">
         <section className="border-b border-border/70 pb-8">
@@ -106,14 +107,12 @@ export function OrganizationOverview({ orgSlug }: { orgSlug: string }) {
 
   const betterAuthMembers = activeOrganization?.members ?? [];
   const memberCount =
-    betterAuthMembers.length > 0
-      ? betterAuthMembers.length
-      : convexOrgData?.memberCount ?? 1;
+    betterAuthMembers.length > 0 ? betterAuthMembers.length : (convexOrgData?.memberCount ?? 1);
 
   const ownerCount =
     betterAuthMembers.length > 0
       ? betterAuthMembers.filter((m) => m.role === "owner").length
-      : convexOrgData?.members.filter((m) => m.role === "owner").length ?? 1;
+      : (convexOrgData?.members.filter((m) => m.role === "owner").length ?? 1);
 
   const createdDate = new Date(organization.createdAt).toLocaleDateString(undefined, {
     dateStyle: "medium",
@@ -234,12 +233,8 @@ export function OrganizationOverview({ orgSlug }: { orgSlug: string }) {
                 >
                   <div className="flex min-w-0 items-center gap-3">
                     <Avatar size="sm">
-                      {member.image ? (
-                        <AvatarImage src={member.image} alt={member.name} />
-                      ) : null}
-                      <AvatarFallback className="text-[10px]">
-                        {member.initials}
-                      </AvatarFallback>
+                      {member.image ? <AvatarImage src={member.image} alt={member.name} /> : null}
+                      <AvatarFallback className="text-[10px]">{member.initials}</AvatarFallback>
                     </Avatar>
                     <div className="min-w-0">
                       <p className="truncate text-sm font-medium">{member.name}</p>

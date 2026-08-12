@@ -19,9 +19,7 @@ import { authClient } from "@/lib/auth-client";
 
 import { OrganizationManagementDialog } from "./organization-management-dialog";
 import { OrganizationManagementLoading } from "./organization-management-loading";
-import {
-  getErrorMessage,
-} from "./organization-management-utils";
+import { getErrorMessage } from "./organization-management-utils";
 import type {
   OrganizationDialogState,
   OrganizationFormValues,
@@ -32,10 +30,9 @@ export function OrganizationManagement() {
   const organizationsQuery = authClient.useListOrganizations();
   const activeOrganizationQuery = authClient.useActiveOrganization();
   const organizations = organizationsQuery.data ?? [];
-  const organizationIds = organizations.map((organization) => organization.id);
   const organizationsMembers = useQuery(
     api.organizations.getMyOrganizationsMembers,
-    organizations.length > 0 ? { organizationIds } : "skip",
+    organizations.length > 0 ? {} : "skip",
   );
   const membersByOrganizationId = new Map(
     organizationsMembers?.map((summary) => [summary.organizationId, summary]) ?? [],
@@ -188,7 +185,12 @@ export function OrganizationManagement() {
               </EmptyDescription>
             </EmptyHeader>
             <EmptyContent>
-              <Button type="button" size="sm" className="gap-2" onClick={() => setDialog({ mode: "create" })}>
+              <Button
+                type="button"
+                size="sm"
+                className="gap-2"
+                onClick={() => setDialog({ mode: "create" })}
+              >
                 <Plus className="size-3.5" />
                 New organization
               </Button>
