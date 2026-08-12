@@ -68,6 +68,11 @@ override what you may have learned about Convex from training data.
 Convex agent skills for common tasks can be installed by running
 `npx convex ai-files install`.
 
+Before changing authentication, invitations, organizations, admin functions,
+rate limits, audit logs, or destructive Convex mutations, **always read and
+follow [docs/CONVEX_AUTH_SECURITY_STANDARDS.md](docs/CONVEX_AUTH_SECURITY_STANDARDS.md)**.
+Its completion gate is required for every matching change.
+
 <!-- convex-ai-end -->
 
 <!-- management-dialog-standard-start -->
