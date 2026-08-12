@@ -221,6 +221,9 @@ importers:
       '@convex-dev/better-auth':
         specifier: 'catalog:'
         version: 0.12.5(@standard-schema/spec@1.1.0)(better-auth@1.6.25(next@16.3.0(@types/node@24.13.3)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(convex@1.43.0(react@19.2.8))(hono@4.13.1)(react@19.2.8)(typescript@6.0.3)
+      '@convex-dev/rate-limiter':
+        specifier: ^0.3.2
+        version: 0.3.2(convex@1.43.0(react@19.2.8))(react@19.2.8)
       better-auth:
         specifier: 'catalog:'
         version: 1.6.25(next@16.3.0(@types/node@24.13.3)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -577,6 +580,15 @@ packages:
       better-auth: '>=1.6.11 <1.7.0'
       convex: ^1.25.0
       react: ^18.3.1 || ^19.0.0
+
+  '@convex-dev/rate-limiter@0.3.2':
+    resolution: {integrity: sha512-+oBPsBfFbzdxiF/9XaaTQmVnvDlvEfg/c69/v8LxTbw4VLuiflIKlfnPQL8OS0azXQQ11hcPWHmU8ytFmHKDXA==}
+    peerDependencies:
+      convex: ^1.24.8
+      react: ^18.2.0 || ^19.0.0
+    peerDependenciesMeta:
+      react:
+        optional: true
 
   '@dotenvx/dotenvx@1.75.1':
     resolution: {integrity: sha512-/BITOC9dmS/edY2zQwZNicQ059O6RKabtQfyEafV0nGtfYRNHYy1DIPiYVcov40+tob9hfmBnbR963dS+EQ1DQ==}
@@ -4230,6 +4242,12 @@ snapshots:
       - '@standard-schema/spec'
       - hono
       - typescript
+
+  '@convex-dev/rate-limiter@0.3.2(convex@1.43.0(react@19.2.8))(react@19.2.8)':
+    dependencies:
+      convex: 1.43.0(react@19.2.8)
+    optionalDependencies:
+      react: 19.2.8
 
   '@dotenvx/dotenvx@1.75.1':
     dependencies:

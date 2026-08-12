@@ -7,7 +7,7 @@ import { v } from "convex/values";
 
 import { components } from "./_generated/api";
 import type { DataModel } from "./_generated/dataModel";
-import { query } from "./_generated/server";
+import { env, query } from "./_generated/server";
 import authConfig from "./auth.config";
 import authSchema from "./betterAuth/schema";
 
@@ -15,7 +15,7 @@ function getSiteUrl() {
   // Convex module analysis and Better Auth schema generation do not expose
   // deployment environment variables. The app config still requires SITE_URL
   // before any deployment can accept this code.
-  const value = process.env.SITE_URL ?? "http://localhost:3001";
+  const value = env.SITE_URL ?? "http://localhost:3001";
 
   const url = new URL(value);
   const isLocalhost = url.hostname === "localhost" || url.hostname === "127.0.0.1";
@@ -31,8 +31,8 @@ const siteUrl = getSiteUrl();
 function getEmailWebhookUrl(kind: "auth" | "invitation") {
   const url =
     kind === "invitation"
-      ? process.env.INVITATION_EMAIL_WEBHOOK_URL || process.env.AUTH_EMAIL_WEBHOOK_URL
-      : process.env.AUTH_EMAIL_WEBHOOK_URL;
+      ? env.INVITATION_EMAIL_WEBHOOK_URL || env.AUTH_EMAIL_WEBHOOK_URL
+      : env.AUTH_EMAIL_WEBHOOK_URL;
 
   if (!url) {
     throw new Error("AUTH_EMAIL_WEBHOOK_URL is required to deliver authentication emails.");
@@ -99,7 +99,7 @@ export const authComponent = createClient<DataModel, typeof authSchema>(componen
 
 export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
   return {
-    secret: process.env.BETTER_AUTH_SECRET,
+    secret: env.BETTER_AUTH_SECRET,
     baseURL: siteUrl,
     trustedOrigins: [siteUrl],
     rateLimit: {

@@ -10,11 +10,13 @@
 
 import type * as account from "../account.js";
 import type * as admin from "../admin.js";
+import type * as audit from "../audit.js";
 import type * as auth from "../auth.js";
 import type * as healthCheck from "../healthCheck.js";
 import type * as http from "../http.js";
 import type * as organizations from "../organizations.js";
 import type * as privateData from "../privateData.js";
+import type * as rateLimits from "../rateLimits.js";
 
 import type {
   ApiFromModules,
@@ -25,11 +27,13 @@ import type {
 declare const fullApi: ApiFromModules<{
   account: typeof account;
   admin: typeof admin;
+  audit: typeof audit;
   auth: typeof auth;
   healthCheck: typeof healthCheck;
   http: typeof http;
   organizations: typeof organizations;
   privateData: typeof privateData;
+  rateLimits: typeof rateLimits;
 }>;
 
 /**
@@ -60,4 +64,5 @@ export declare const internal: FilterApi<
 
 export declare const components: {
   betterAuth: import("../betterAuth/_generated/component.js").ComponentApi<"betterAuth">;
+  rateLimiter: import("@convex-dev/rate-limiter/_generated/component.js").ComponentApi<"rateLimiter">;
 };

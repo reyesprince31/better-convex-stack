@@ -282,7 +282,10 @@ export default function AccountSettings() {
 
     setIsDeletingAccount(true);
     try {
-      await deleteCurrentUser({ password: deletePassword });
+      const result = await deleteCurrentUser({ password: deletePassword });
+      if (!result.success) {
+        throw new Error("Your current password is incorrect.");
+      }
       toast.success("Your account has been deleted");
       window.location.replace("/login");
     } catch (error) {
