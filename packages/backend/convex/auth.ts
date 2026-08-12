@@ -53,19 +53,21 @@ async function sendInvitationEmail(data: {
   }
 }
 
-export const authComponent = createClient<DataModel, typeof authSchema>(
-  components.betterAuth,
-  {
-    local: {
-      schema: authSchema,
-    },
+export const authComponent = createClient<DataModel, typeof authSchema>(components.betterAuth, {
+  local: {
+    schema: authSchema,
   },
-);
+});
 
 export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
   return {
     baseURL: siteUrl,
     trustedOrigins: [siteUrl],
+    user: {
+      deleteUser: {
+        enabled: true,
+      },
+    },
     database: authComponent.adapter(ctx),
     emailAndPassword: {
       enabled: true,
@@ -86,8 +88,7 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
   } satisfies BetterAuthOptions;
 };
 
-export const createAuth = (ctx: GenericCtx<DataModel>) =>
-  betterAuth(createAuthOptions(ctx));
+export const createAuth = (ctx: GenericCtx<DataModel>) => betterAuth(createAuthOptions(ctx));
 
 export const getCurrentUser = query({
   args: {},

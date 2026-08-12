@@ -1,3 +1,5 @@
+import { Button } from "@better-convex-stack/ui/components/button";
+import { Bell } from "lucide-react";
 import Link from "next/link";
 
 import UserMenu from "@/components/account/user-menu";
@@ -38,7 +40,16 @@ export function PersonalHeader() {
           </nav>
         </div>
         <div className="flex items-center gap-2">
-          <UserMenu className="w-auto" side="bottom" align="end" />
+          <Button
+            variant="ghost"
+            size="icon"
+            render={<Link href="/home/settings?section=notifications" />}
+            aria-label="Notifications"
+            title="Notifications"
+          >
+            <Bell />
+          </Button>
+          <UserMenu showIdentity={false} side="bottom" align="end" />
         </div>
       </div>
     </header>

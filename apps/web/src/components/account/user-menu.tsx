@@ -42,10 +42,12 @@ export default function UserMenu({
   className,
   side = "right",
   align = "start",
+  showIdentity = true,
 }: {
   className?: string;
   side?: "bottom" | "left" | "right" | "top";
   align?: "center" | "end" | "start";
+  showIdentity?: boolean;
 } = {}) {
   const pathname = usePathname();
   const user = useQuery(api.auth.getCurrentUser);
@@ -55,17 +57,25 @@ export default function UserMenu({
     return (
       <Button
         variant="ghost"
-        size="lg"
-        className={`group h-12 w-full justify-start gap-3 px-2 ${className ?? ""}`}
+        size={showIdentity ? "lg" : "icon"}
+        className={
+          showIdentity
+            ? `group h-12 w-full justify-start gap-3 px-2 ${className ?? ""}`
+            : `group size-8 justify-center p-0 ${className ?? ""}`
+        }
         disabled
         aria-label="Loading account"
       >
         <Skeleton className="size-8 rounded-full" />
-        <span className="grid min-w-0 flex-1 gap-1 text-left">
-          <Skeleton className="h-3 w-16" />
-          <Skeleton className="h-2.5 w-24" />
-        </span>
-        <ChevronDown className="size-3.5 text-muted-foreground" />
+        {showIdentity ? (
+          <>
+            <span className="grid min-w-0 flex-1 gap-1 text-left">
+              <Skeleton className="h-3 w-16" />
+              <Skeleton className="h-2.5 w-24" />
+            </span>
+            <ChevronDown className="size-3.5 text-muted-foreground" />
+          </>
+        ) : null}
       </Button>
     );
   }
@@ -90,8 +100,12 @@ export default function UserMenu({
         render={
           <Button
             variant="ghost"
-            size="lg"
-            className={`group h-12 w-full justify-start gap-3 px-2 ${className ?? ""}`}
+            size={showIdentity ? "lg" : "icon"}
+            className={
+              showIdentity
+                ? `group h-12 w-full justify-start gap-3 px-2 ${className ?? ""}`
+                : `group size-8 justify-center p-0 ${className ?? ""}`
+            }
             aria-label="Open account menu"
           />
         }
@@ -99,13 +113,17 @@ export default function UserMenu({
         <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-foreground text-[10px] font-medium text-background">
           {initials}
         </span>
-        <span className="grid min-w-0 flex-1 text-left leading-tight">
-          <span className="max-w-28 truncate text-xs font-medium">{displayName}</span>
-          <span className="max-w-36 truncate text-[10px] text-muted-foreground">
-            {user?.email ?? "Signed-in account"}
+        {showIdentity ? (
+          <span className="grid min-w-0 flex-1 text-left leading-tight">
+            <span className="max-w-28 truncate text-xs font-medium">{displayName}</span>
+            <span className="max-w-36 truncate text-[10px] text-muted-foreground">
+              {user?.email ?? "Signed-in account"}
+            </span>
           </span>
-        </span>
-        <ChevronDown className="size-3.5 shrink-0 text-muted-foreground transition-transform group-data-popup-open:rotate-180" />
+        ) : null}
+        {showIdentity ? (
+          <ChevronDown className="size-3.5 shrink-0 text-muted-foreground transition-transform group-data-popup-open:rotate-180" />
+        ) : null}
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align={align}
