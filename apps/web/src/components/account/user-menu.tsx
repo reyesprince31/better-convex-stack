@@ -17,6 +17,7 @@ import {
   Check,
   ChevronDown,
   Home,
+  MailCheck,
   LogOut,
   Monitor,
   Moon,
@@ -145,6 +146,10 @@ export default function UserMenu({
             <DropdownMenuSeparator />
           </>
         ) : null}
+        <DropdownMenuItem render={<Link href="/home/invitations" />}>
+          <MailCheck />
+          Invitations
+        </DropdownMenuItem>
         <DropdownMenuItem render={<Link href="/home/settings" />}>
           <Settings2 />
           Account settings

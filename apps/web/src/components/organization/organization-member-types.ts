@@ -1,11 +1,16 @@
 import type { authClient } from "@/lib/auth-client";
 
-type ActiveOrganization = NonNullable<
-  ReturnType<typeof authClient.useActiveOrganization>["data"]
->;
+type ActiveOrganization = NonNullable<ReturnType<typeof authClient.useActiveOrganization>["data"]>;
 
 export type OrganizationMember = ActiveOrganization["members"][number];
 export type OrganizationInvitation = ActiveOrganization["invitations"][number];
+
+export type OrganizationInvitationShare = {
+  email: string;
+  invitationId: string;
+  inviteLink: string;
+  role: string;
+};
 
 export function getInitials(name: string) {
   const parts = name.trim().split(/\s+/).filter(Boolean);

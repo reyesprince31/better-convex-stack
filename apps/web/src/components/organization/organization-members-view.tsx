@@ -23,7 +23,9 @@ import { OrganizationMemberList } from "@/components/organization/organization-m
 import {
   getAuthErrorMessage,
   hasOrganizationRole,
+  type OrganizationInvitationShare,
 } from "@/components/organization/organization-member-types";
+import { OrganizationInvitationShareDialog } from "@/components/organization/organization-invitation-share-dialog";
 import { OrganizationResourcePage } from "@/components/organization/organization-resource-page";
 
 export function OrganizationMembersView({ orgSlug }: { orgSlug: string }) {
@@ -34,11 +36,14 @@ export function OrganizationMembersView({ orgSlug }: { orgSlug: string }) {
   const [syncError, setSyncError] = useState<string | null>(null);
   const [pendingMemberId, setPendingMemberId] = useState<string | null>(null);
   const [pendingInvitationId, setPendingInvitationId] = useState<string | null>(null);
+  const [invitationToShare, setInvitationToShare] = useState<OrganizationInvitationShare | null>(
+    null,
+  );
 
   const organization = organizationsQuery.data?.find((item) => item.slug === orgSlug);
   const activeOrganization =
     activeOrganizationQuery.data?.id === organization?.id ? activeOrganizationQuery.data : null;
-  const activeRole = activeOrganization ? activeMemberQuery.data?.role ?? "" : "";
+  const activeRole = activeOrganization ? (activeMemberQuery.data?.role ?? "") : "";
   const canManageMembers =
     hasOrganizationRole(activeRole, "owner") || hasOrganizationRole(activeRole, "admin");
   const canSetOwner = hasOrganizationRole(activeRole, "owner");
@@ -54,9 +59,11 @@ export function OrganizationMembersView({ orgSlug }: { orgSlug: string }) {
     }
 
     requestedOrganizationId.current = organization.id;
-    void authClient.organization.setActive({ organizationId: organization.id }).then(({ error }) => {
-      if (error) setSyncError(error.message || "This workspace could not be selected.");
-    });
+    void authClient.organization
+      .setActive({ organizationId: organization.id })
+      .then(({ error }) => {
+        if (error) setSyncError(error.message || "This workspace could not be selected.");
+      });
   }, [activeOrganizationQuery.data?.id, activeOrganizationQuery.isPending, organization]);
 
   if (organizationsQuery.isPending) {
@@ -196,13 +203,21 @@ export function OrganizationMembersView({ orgSlug }: { orgSlug: string }) {
           organizationId={organization.id}
           canInvite={canManageMembers}
           canInviteOwner={canSetOwner}
+          onInvitationCreated={setInvitationToShare}
+        />
+
+        <OrganizationInvitationShareDialog
+          invitation={invitationToShare}
+          onClose={() => setInvitationToShare(null)}
         />
 
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1.25fr)_minmax(18rem,0.75fr)]">
-        <OrganizationMemberList
+          <OrganizationMemberList
             members={members}
             isLoading={
-              activeOrganizationQuery.isPending || activeMemberQuery.isPending || !activeOrganization
+              activeOrganizationQuery.isPending ||
+              activeMemberQuery.isPending ||
+              !activeOrganization
             }
             canManageMembers={canManageMembers}
             canSetOwner={canSetOwner}

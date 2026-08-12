@@ -29,6 +29,9 @@ export function PersonalHeader() {
             <Link href="/home/organizations" className="transition-colors hover:text-foreground">
               Organizations
             </Link>
+            <Link href="/home/invitations" className="transition-colors hover:text-foreground">
+              Invitations
+            </Link>
             <Link href="/home/settings" className="transition-colors hover:text-foreground">
               Settings
             </Link>

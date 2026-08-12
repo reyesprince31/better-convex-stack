@@ -31,11 +31,19 @@ export function AcceptInvitationView() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!invitationId || sessionQuery.isPending || !sessionQuery.data) return;
+    if (!invitationId || sessionQuery.isPending) return;
+
+    if (!sessionQuery.data) {
+      setInvitation(null);
+      setError(null);
+      setIsLoading(false);
+      return;
+    }
 
     let isCurrent = true;
     setIsLoading(true);
     setError(null);
+    setInvitation(null);
 
     void authClient.organization
       .getInvitation({ query: { id: invitationId } })
@@ -50,7 +58,8 @@ export function AcceptInvitationView() {
         setInvitation(result.data);
       })
       .catch((requestError: unknown) => {
-        if (isCurrent) setError(getAuthErrorMessage(requestError, "This invitation is no longer available."));
+        if (isCurrent)
+          setError(getAuthErrorMessage(requestError, "This invitation is no longer available."));
       })
       .finally(() => {
         if (isCurrent) setIsLoading(false);
@@ -84,7 +93,12 @@ export function AcceptInvitationView() {
   }
 
   if (!invitationId) {
-    return <InvitationState title="Invitation link is incomplete" description="Ask the inviter to send a new invitation link." />;
+    return (
+      <InvitationState
+        title="Invitation link is incomplete"
+        description="Ask the inviter to send a new invitation link."
+      />
+    );
   }
 
   if (sessionQuery.isPending || isLoading) {
@@ -100,7 +114,10 @@ export function AcceptInvitationView() {
         description="Use the account that received the invitation, then return here to join the workspace."
       >
         <div className="flex flex-col gap-2 sm:flex-row sm:justify-center">
-          <Button render={<Link href={`/sign-in?redirect=${encodeURIComponent(redirectPath)}`} />} nativeButton={false}>
+          <Button
+            render={<Link href={`/sign-in?redirect=${encodeURIComponent(redirectPath)}`} />}
+            nativeButton={false}
+          >
             Sign in <ArrowRight className="size-3.5" />
           </Button>
           <Button
@@ -116,12 +133,20 @@ export function AcceptInvitationView() {
   }
 
   if (error || !invitation) {
-    return <InvitationState title="Invitation unavailable" description={error ?? "This invitation could not be found."} />;
+    return (
+      <InvitationState
+        title="Invitation unavailable"
+        description={error ?? "This invitation could not be found."}
+      />
+    );
   }
 
   return (
     <main className="mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-2xl items-center justify-center px-5 py-16 sm:px-8">
-      <section className="w-full border border-border/70 bg-background" aria-labelledby="accept-invitation-title">
+      <section
+        className="w-full border border-border/70 bg-background"
+        aria-labelledby="accept-invitation-title"
+      >
         <div className="border-b border-border/70 px-6 py-6 sm:px-8">
           <div className="flex size-10 items-center justify-center bg-foreground text-background">
             <Building2 className="size-5" />
@@ -129,7 +154,10 @@ export function AcceptInvitationView() {
           <p className="mt-6 font-mono text-[10px] tracking-[0.16em] text-muted-foreground uppercase">
             Workspace invitation
           </p>
-          <h1 id="accept-invitation-title" className="mt-2 text-3xl font-medium tracking-tighter sm:text-4xl">
+          <h1
+            id="accept-invitation-title"
+            className="mt-2 text-3xl font-medium tracking-tighter sm:text-4xl"
+          >
             Join {invitation.organizationName}
           </h1>
           <p className="mt-3 max-w-lg text-sm leading-6 text-muted-foreground">
@@ -140,12 +168,16 @@ export function AcceptInvitationView() {
         <div className="grid gap-3 px-6 py-6 sm:grid-cols-2 sm:px-8">
           <div className="border border-border/70 p-4">
             <ShieldCheck className="size-4 text-muted-foreground" />
-            <p className="mt-5 font-mono text-[10px] tracking-[0.16em] text-muted-foreground uppercase">Your role</p>
+            <p className="mt-5 font-mono text-[10px] tracking-[0.16em] text-muted-foreground uppercase">
+              Your role
+            </p>
             <p className="mt-1 text-sm font-medium">{formatOrganizationRole(invitation.role)}</p>
           </div>
           <div className="border border-border/70 p-4">
             <Check className="size-4 text-muted-foreground" />
-            <p className="mt-5 font-mono text-[10px] tracking-[0.16em] text-muted-foreground uppercase">Signed in as</p>
+            <p className="mt-5 font-mono text-[10px] tracking-[0.16em] text-muted-foreground uppercase">
+              Signed in as
+            </p>
             <p className="mt-1 truncate text-sm font-medium">{sessionQuery.data.user.email}</p>
           </div>
         </div>
@@ -157,8 +189,15 @@ export function AcceptInvitationView() {
         ) : null}
 
         <div className="flex flex-col gap-3 border-t border-border/70 px-6 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
-          <p className="text-xs text-muted-foreground">Accepting will add this workspace to your account.</p>
-          <Button type="button" className="gap-2" disabled={isAccepting} onClick={() => void acceptInvitation()}>
+          <p className="text-xs text-muted-foreground">
+            Accepting will add this workspace to your account.
+          </p>
+          <Button
+            type="button"
+            className="gap-2"
+            disabled={isAccepting}
+            onClick={() => void acceptInvitation()}
+          >
             {isAccepting ? "Joining..." : "Accept invitation"}
             <ArrowRight className="size-3.5" />
           </Button>
@@ -171,7 +210,10 @@ export function AcceptInvitationView() {
 function InvitationLoading() {
   return (
     <main className="mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-2xl items-center justify-center px-5 py-16 sm:px-8">
-      <section className="w-full border border-border/70 bg-background p-6 sm:p-8" aria-label="Loading invitation">
+      <section
+        className="w-full border border-border/70 bg-background p-6 sm:p-8"
+        aria-label="Loading invitation"
+      >
         <Skeleton className="size-10" />
         <Skeleton className="mt-7 h-3 w-40" />
         <Skeleton className="mt-3 h-10 w-72 max-w-full" />
@@ -196,10 +238,15 @@ function InvitationState({
 }) {
   return (
     <main className="mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-2xl items-center justify-center px-5 py-16 sm:px-8">
-      <section className="w-full border border-border/70 bg-background p-6 text-center sm:p-8" role="alert">
+      <section
+        className="w-full border border-border/70 bg-background p-6 text-center sm:p-8"
+        role="alert"
+      >
         <Building2 className="mx-auto size-6 text-muted-foreground" />
         <h1 className="mt-5 text-2xl font-medium tracking-[-0.04em]">{title}</h1>
-        <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-muted-foreground">{description}</p>
+        <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-muted-foreground">
+          {description}
+        </p>
         {children ? <div className="mt-6">{children}</div> : null}
       </section>
     </main>

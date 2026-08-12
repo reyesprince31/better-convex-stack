@@ -13,14 +13,17 @@ import {
 } from "@better-convex-stack/ui/components/dialog";
 import { Input } from "@better-convex-stack/ui/components/input";
 import { Label } from "@better-convex-stack/ui/components/label";
-import { Check, Copy, MailPlus } from "lucide-react";
+import { MailPlus } from "lucide-react";
 import type * as React from "react";
 import { useState } from "react";
 import { toast } from "sonner";
 
 import { authClient } from "@/lib/auth-client";
 
-import { getAuthErrorMessage } from "@/components/organization/organization-member-types";
+import {
+  getAuthErrorMessage,
+  type OrganizationInvitationShare,
+} from "@/components/organization/organization-member-types";
 
 type OrganizationRole = "member" | "admin" | "owner";
 
@@ -28,35 +31,35 @@ export function OrganizationInviteForm({
   organizationId,
   canInvite,
   canInviteOwner,
+  onInvitationCreated,
 }: {
   organizationId: string;
   canInvite: boolean;
   canInviteOwner: boolean;
+  onInvitationCreated: (invitation: OrganizationInvitationShare) => void;
 }) {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<OrganizationRole>("member");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
-  const [inviteLink, setInviteLink] = useState<string | null>(null);
-  const [hasCopied, setHasCopied] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
   async function handleSubmit(event: React.SubmitEvent) {
     event.preventDefault();
 
     const formData = new FormData(event.target);
-    const nextEmail = String(formData.get("email") ?? "").trim().toLowerCase();
+    const nextEmail = String(formData.get("email") ?? "")
+      .trim()
+      .toLowerCase();
     const nextRole = String(formData.get("role") ?? "member");
 
-    if (!nextEmail || !nextEmail.includes("@")) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(nextEmail)) {
       setFormError("Enter a valid email address.");
       return;
     }
 
     setIsSubmitting(true);
     setFormError(null);
-    setInviteLink(null);
-    setHasCopied(false);
 
     try {
       const result = await authClient.organization.inviteMember({
@@ -66,18 +69,22 @@ export function OrganizationInviteForm({
       });
 
       if (result.error || !result.data) {
-        throw new Error(
-          getAuthErrorMessage(result.error, "The invitation could not be created."),
-        );
+        throw new Error(getAuthErrorMessage(result.error, "The invitation could not be created."));
       }
 
       const url = new URL("/accept-invitation", window.location.origin);
       url.searchParams.set("id", result.data.id);
-      const nextInviteLink = url.toString();
 
       setEmail("");
-      setInviteLink(nextInviteLink);
-      toast.success(`Invitation prepared for ${nextEmail}`);
+      setRole("member");
+      setIsOpen(false);
+      onInvitationCreated({
+        email: nextEmail,
+        invitationId: result.data.id,
+        inviteLink: url.toString(),
+        role: nextRole,
+      });
+      toast.success("Invitation created");
     } catch (error) {
       setFormError(getAuthErrorMessage(error, "The invitation could not be created."));
     } finally {
@@ -85,20 +92,11 @@ export function OrganizationInviteForm({
     }
   }
 
-  async function copyInviteLink() {
-    if (!inviteLink) return;
-
-    try {
-      await navigator.clipboard.writeText(inviteLink);
-      setHasCopied(true);
-      toast.success("Invitation link copied");
-    } catch {
-      setFormError("The link could not be copied. Select it and copy it manually.");
-    }
-  }
-
   return (
-    <section className="border border-border/70 bg-background" aria-labelledby="invite-member-title">
+    <section
+      className="border border-border/70 bg-background"
+      aria-labelledby="invite-member-title"
+    >
       <div className="flex flex-col gap-4 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
         <span className="flex size-8 shrink-0 items-center justify-center bg-foreground text-background">
           <MailPlus className="size-4" />
@@ -121,8 +119,6 @@ export function OrganizationInviteForm({
               setEmail("");
               setRole("member");
               setFormError(null);
-              setInviteLink(null);
-              setHasCopied(false);
               setIsOpen(true);
             } else if (!isSubmitting) {
               setIsOpen(false);
@@ -186,33 +182,6 @@ export function OrganizationInviteForm({
                   {formError}
                 </p>
               ) : null}
-
-              {inviteLink ? (
-                <div className="grid gap-3 border border-border/70 bg-muted/30 p-4" role="status">
-                  <div className="grid gap-2">
-                    <Label htmlFor="member-invite-link">Share this invitation link</Label>
-                    <Input
-                      id="member-invite-link"
-                      value={inviteLink}
-                      readOnly
-                      aria-label="Invitation link"
-                    />
-                  </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full gap-2 sm:w-fit"
-                    onClick={() => void copyInviteLink()}
-                  >
-                    {hasCopied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
-                    {hasCopied ? "Copied" : "Copy link"}
-                  </Button>
-                  <p className="text-[11px] text-muted-foreground">
-                    The link remains available while you test locally.
-                  </p>
-                </div>
-              ) : null}
-
             </form>
             <DialogFooter>
               <DialogClose
@@ -229,7 +198,7 @@ export function OrganizationInviteForm({
                 disabled={!canInvite || isSubmitting}
               >
                 <MailPlus className="size-3.5" />
-                {isSubmitting ? "Inviting…" : "Invite member"}
+                {isSubmitting ? "Inviting..." : "Invite member"}
               </Button>
             </DialogFooter>
           </DialogContent>
