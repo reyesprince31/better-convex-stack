@@ -15,8 +15,9 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
   `account`, `theme`, `providers`, and `shared`. Keep feature-specific
   subcomponents beside the route-facing component they support, and import
   them through their feature path rather than adding a broad barrel file.
-- Public pages live under `src/app/(public)` and own their marketing, journal,
-  and authentication navigation. The `(public)` group does not appear in URLs.
+- Public pages live under `src/app/(public)` and own the marketing and journal
+  surfaces. Authentication pages live under `src/app/(auth)` at `/login` and
+  `/signup`; the route group does not appear in URLs.
 - Authenticated SaaS pages live under `src/app/(protected)`: `/home` is the
   personal workspace, `/home/[orgSlug]` is an organization workspace, and
   `/admin` is the admin console.
@@ -35,10 +36,12 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
   static navigation links can be included in the first RSC payload. Keep
   pathname, user, theme, and workspace-switching hooks inside their small
   client components (`UserMenu` and `WorkspaceSwitcher`).
-- Keep static authentication framing in the server-rendered `AuthPage`; isolate
-  only the sign-in/sign-up mode state in `AuthModeSwitcher`. Likewise, do not
-  mark a static parent client-only just because it renders a client island
-  such as `ModeToggle`, a form, or a provider.
+- Keep static authentication framing in the server-rendered `AuthPage`; each
+  auth route should render its own small client form inside a `Suspense`
+  boundary. Keep the login and signup flows as separate routes instead of
+  coupling them through a mode switcher. Likewise, do not mark a static parent
+  client-only just because it renders a client island such as `ModeToggle`, a
+  form, or a provider.
 - The `/home/organizations` personal route lists organizations in a table and
   owns the future create-organization action. Keep `/home` itself free of a
   workspace selector.
