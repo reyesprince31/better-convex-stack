@@ -1,5 +1,6 @@
 "use client";
 
+import { api } from "@better-convex-stack/backend/convex/_generated/api";
 import { Button } from "@better-convex-stack/ui/components/button";
 import {
   Empty,
@@ -9,217 +10,53 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@better-convex-stack/ui/components/empty";
-import { Input } from "@better-convex-stack/ui/components/input";
-import { Label } from "@better-convex-stack/ui/components/label";
-import { Skeleton } from "@better-convex-stack/ui/components/skeleton";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@better-convex-stack/ui/components/dropdown-menu";
-import { Building2, Check, MoreHorizontal, Pencil, Plus, Trash2, X } from "lucide-react";
-import Link from "next/link";
-import type * as React from "react";
+import { useQuery } from "convex/react";
+import { Building2, Plus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
 import { authClient } from "@/lib/auth-client";
 
-type Organization = NonNullable<ReturnType<typeof authClient.useListOrganizations>["data"]>[number];
-
-function slugify(value: string) {
-  return value
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 48);
-}
-
-function getErrorMessage(error: { message?: string } | null | undefined, fallback: string) {
-  return error?.message || fallback;
-}
-
-function OrganizationMark({ name }: { name: string }) {
-  return (
-    <span className="flex size-9 shrink-0 items-center justify-center bg-foreground text-background">
-      <span className="font-mono text-[11px] font-semibold tracking-[-0.12em]">
-        {name.slice(0, 2).toLowerCase()}
-      </span>
-    </span>
-  );
-}
-
-function OrganizationRow({
-  organization,
-  isActive,
-  isDeleting,
-  onEdit,
-  onDelete,
-  onCancelDelete,
-}: {
-  organization: Organization;
-  isActive: boolean;
-  isDeleting: boolean;
-  onEdit: (organization: Organization) => void;
-  onDelete: (organization: Organization) => void;
-  onCancelDelete: () => void;
-}) {
-  if (isDeleting) {
-    return (
-      <div className="flex flex-col gap-4 border-b border-border/70 px-5 py-5 last:border-b-0 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-3">
-          <span className="flex size-9 shrink-0 items-center justify-center bg-destructive/10 text-destructive">
-            <Trash2 className="size-4" />
-          </span>
-          <div>
-            <p className="text-sm font-medium">Delete {organization.name}?</p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              This removes the workspace and its membership records.
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2 sm:shrink-0">
-          <Button type="button" variant="ghost" size="sm" onClick={onCancelDelete}>
-            Keep it
-          </Button>
-          <Button
-            type="button"
-            variant="destructive"
-            size="sm"
-            onClick={() => onDelete(organization)}
-          >
-            Delete workspace
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="group flex flex-col gap-4 border-b border-border/70 px-5 py-5 last:border-b-0 sm:flex-row sm:items-center sm:justify-between">
-      <div className="flex min-w-0 items-center gap-3">
-        <OrganizationMark name={organization.name} />
-        <div className="min-w-0">
-          <div className="flex items-center gap-2">
-            <Link
-              href={`/home/${organization.slug}`}
-              className="truncate text-sm font-medium transition-colors hover:text-primary"
-            >
-              {organization.name}
-            </Link>
-            {isActive ? (
-              <span className="inline-flex shrink-0 items-center gap-1 font-mono text-[9px] tracking-[0.12em] text-emerald-600 uppercase dark:text-emerald-400">
-                <Check className="size-3" /> Active
-              </span>
-            ) : null}
-          </div>
-          <p className="mt-1 truncate font-mono text-[10px] text-muted-foreground">
-            /{organization.slug}
-          </p>
-        </div>
-      </div>
-
-      <div className="flex items-center justify-between gap-4 sm:shrink-0 sm:justify-end">
-        <p className="text-xs text-muted-foreground">
-          Created{" "}
-          {new Date(organization.createdAt).toLocaleDateString(undefined, { dateStyle: "medium" })}
-        </p>
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            render={
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon-sm"
-                aria-label={`Actions for ${organization.name}`}
-              >
-                <MoreHorizontal className="size-4" />
-              </Button>
-            }
-          />
-          <DropdownMenuContent align="end" className="w-36">
-            <DropdownMenuItem onClick={() => onEdit(organization)}>
-              <Pencil />
-              Edit details
-            </DropdownMenuItem>
-            <DropdownMenuItem variant="destructive" onClick={() => onDelete(organization)}>
-              <Trash2 />
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-    </div>
-  );
-}
+import { OrganizationManagementDialog } from "./organization-management-dialog";
+import { OrganizationManagementLoading } from "./organization-management-loading";
+import {
+  getErrorMessage,
+} from "./organization-management-utils";
+import type {
+  OrganizationDialogState,
+  OrganizationFormValues,
+} from "./organization-management-types";
+import { OrganizationRow } from "./organization-row";
 
 export function OrganizationManagement() {
   const organizationsQuery = authClient.useListOrganizations();
   const activeOrganizationQuery = authClient.useActiveOrganization();
   const organizations = organizationsQuery.data ?? [];
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingOrganizationId, setEditingOrganizationId] = useState<string | null>(null);
-  const [deletingOrganizationId, setDeletingOrganizationId] = useState<string | null>(null);
-  const [name, setName] = useState("");
-  const [slug, setSlug] = useState("");
-  const [slugWasEdited, setSlugWasEdited] = useState(false);
-  const [formError, setFormError] = useState<string | null>(null);
+  const organizationIds = organizations.map((organization) => organization.id);
+  const organizationsMembers = useQuery(
+    api.organizations.getMyOrganizationsMembers,
+    organizations.length > 0 ? { organizationIds } : "skip",
+  );
+  const membersByOrganizationId = new Map(
+    organizationsMembers?.map((summary) => [summary.organizationId, summary]) ?? [],
+  );
+  const [dialog, setDialog] = useState<OrganizationDialogState | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
-  const editingOrganization = organizations.find(({ id }) => id === editingOrganizationId);
+  const dialogOrganization =
+    dialog && "organizationId" in dialog
+      ? organizations.find(({ id }) => id === dialog.organizationId)
+      : undefined;
 
-  function openCreateForm() {
-    setEditingOrganizationId(null);
-    setDeletingOrganizationId(null);
-    setName("");
-    setSlug("");
-    setSlugWasEdited(false);
-    setFormError(null);
-    setIsFormOpen(true);
-  }
-
-  function openEditForm(organization: Organization) {
-    setEditingOrganizationId(organization.id);
-    setDeletingOrganizationId(null);
-    setName(organization.name);
-    setSlug(organization.slug);
-    setSlugWasEdited(true);
-    setFormError(null);
-    setIsFormOpen(true);
-  }
-
-  function closeForm() {
-    if (isSaving) return;
-    setIsFormOpen(false);
-    setFormError(null);
-  }
-
-  async function handleSubmit(event: React.SubmitEvent) {
-    event.preventDefault();
-    const formData = new FormData(event.target);
-    const nextName = String(formData.get("name") ?? "").trim();
-    const nextSlug = slugify(String(formData.get("slug") ?? ""));
-
-    if (!nextName) {
-      setFormError("Enter a name for this organization.");
-      return;
-    }
-
-    if (!nextSlug) {
-      setFormError("Add a URL-friendly slug for this organization.");
-      return;
-    }
+  async function handleSave(values: OrganizationFormValues) {
+    if (!dialog || (dialog.mode !== "create" && dialog.mode !== "edit")) return;
 
     setIsSaving(true);
-    setFormError(null);
-
     try {
-      if (editingOrganizationId) {
+      if (dialog.mode === "edit") {
         const { error } = await authClient.organization.update({
-          organizationId: editingOrganizationId,
-          data: { name: nextName, slug: nextSlug },
+          organizationId: dialog.organizationId,
+          data: values,
         });
 
         if (error) {
@@ -228,7 +65,7 @@ export function OrganizationManagement() {
 
         toast.success("Organization updated");
       } else {
-        const { error } = await authClient.organization.create({ name: nextName, slug: nextSlug });
+        const { error } = await authClient.organization.create(values);
 
         if (error) {
           throw new Error(getErrorMessage(error, "The organization could not be created."));
@@ -237,19 +74,19 @@ export function OrganizationManagement() {
         toast.success("Organization created");
       }
 
-      setIsFormOpen(false);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Something went wrong.";
-      setFormError(message);
+      setDialog(null);
     } finally {
       setIsSaving(false);
     }
   }
 
-  async function handleDelete(organization: Organization) {
-    setIsSaving(true);
-    setFormError(null);
+  async function handleDelete() {
+    if (!dialog || dialog.mode !== "delete") return;
 
+    const organization = organizations.find(({ id }) => id === dialog.organizationId);
+    if (!organization) return;
+
+    setIsSaving(true);
     try {
       if (activeOrganizationQuery.data?.id === organization.id) {
         const { error } = await authClient.organization.setActive({ organizationId: null });
@@ -265,30 +102,18 @@ export function OrganizationManagement() {
         throw new Error(getErrorMessage(error, "The organization could not be deleted."));
       }
 
-      setDeletingOrganizationId(null);
+      setDialog(null);
       toast.success("Organization deleted");
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Something went wrong.";
-      toast.error(message);
-      setDeletingOrganizationId(null);
+      toast.error(getErrorMessage(error, "The organization could not be deleted."));
+      setDialog(null);
     } finally {
       setIsSaving(false);
     }
   }
 
   if (organizationsQuery.isPending) {
-    return (
-      <section className="border border-border/70 bg-background" aria-label="Loading organizations">
-        <div className="flex items-center justify-between border-b border-border/70 px-5 py-4">
-          <Skeleton className="h-4 w-36" />
-          <Skeleton className="h-8 w-28" />
-        </div>
-        <div className="space-y-4 p-5">
-          <Skeleton className="h-12 w-full" />
-          <Skeleton className="h-12 w-full" />
-        </div>
-      </section>
-    );
+    return <OrganizationManagementLoading />;
   }
 
   if (organizationsQuery.error) {
@@ -311,85 +136,6 @@ export function OrganizationManagement() {
 
   return (
     <div className="space-y-4">
-      {isFormOpen ? (
-        <section
-          className="border border-border/70 bg-background"
-          aria-labelledby="organization-form-title"
-        >
-          <div className="flex items-start justify-between gap-4 border-b border-border/70 px-5 py-4">
-            <div>
-              <p className="font-mono text-[10px] tracking-[0.16em] text-muted-foreground uppercase">
-                {editingOrganization ? "Edit organization" : "New organization"}
-              </p>
-              <h2 id="organization-form-title" className="mt-1 text-sm font-medium">
-                {editingOrganization
-                  ? "Update workspace details"
-                  : "Create a workspace for your team"}
-              </h2>
-            </div>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-sm"
-              aria-label="Close form"
-              onClick={closeForm}
-            >
-              <X className="size-4" />
-            </Button>
-          </div>
-          <form
-            className="grid gap-4 p-5 md:grid-cols-[1fr_0.7fr_auto] md:items-end"
-            onSubmit={handleSubmit}
-          >
-            <div className="grid gap-2">
-              <Label htmlFor="organization-name">Name</Label>
-              <Input
-                id="organization-name"
-                name="name"
-                value={name}
-                onChange={(event) => {
-                  setName(event.target.value);
-                  if (!editingOrganization && !slugWasEdited) setSlug(slugify(event.target.value));
-                }}
-                placeholder="e.g. Northstar"
-                autoComplete="organization"
-                disabled={isSaving}
-                autoFocus
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="organization-slug">Slug</Label>
-              <Input
-                id="organization-slug"
-                name="slug"
-                value={slug}
-                onChange={(event) => {
-                  setSlugWasEdited(true);
-                  setSlug(slugify(event.target.value));
-                }}
-                placeholder="northstar"
-                autoCapitalize="none"
-                autoComplete="off"
-                spellCheck={false}
-                disabled={isSaving}
-              />
-            </div>
-            <Button type="submit" className="h-8 gap-2" disabled={isSaving}>
-              {isSaving
-                ? "Saving..."
-                : editingOrganization
-                  ? "Save changes"
-                  : "Create organization"}
-            </Button>
-            {formError ? (
-              <p className="text-xs text-destructive md:col-span-full" role="alert">
-                {formError}
-              </p>
-            ) : null}
-          </form>
-        </section>
-      ) : null}
-
       <section
         className="border border-border/70 bg-background"
         aria-labelledby="organization-list-title"
@@ -397,23 +143,22 @@ export function OrganizationManagement() {
         <div className="flex flex-col gap-4 border-b border-border/70 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="font-mono text-[10px] tracking-[0.16em] text-muted-foreground uppercase">
-              Your workspaces
+              Organizations
             </p>
             <h2 id="organization-list-title" className="mt-1 text-sm font-medium">
               {organizations.length === 1
-                ? "One organization connected"
+                ? "1 organization connected"
                 : `${organizations.length} organizations connected`}
             </h2>
           </div>
           <Button
             type="button"
             size="sm"
-            className="gap-2"
-            onClick={openCreateForm}
-            disabled={isFormOpen}
+            className="w-full gap-2 sm:w-auto"
+            onClick={() => setDialog({ mode: "create" })}
           >
             <Plus className="size-3.5" />
-            Add organization
+            New organization
           </Button>
         </div>
 
@@ -424,13 +169,10 @@ export function OrganizationManagement() {
                 key={organization.id}
                 organization={organization}
                 isActive={activeOrganizationQuery.data?.id === organization.id}
-                isDeleting={deletingOrganizationId === organization.id}
-                onEdit={openEditForm}
-                onDelete={(target) => {
-                  if (deletingOrganizationId === target.id) void handleDelete(target);
-                  else setDeletingOrganizationId(target.id);
-                }}
-                onCancelDelete={() => setDeletingOrganizationId(null)}
+                membersSummary={membersByOrganizationId.get(organization.id)}
+                isLoadingMembers={organizationsMembers === undefined}
+                onEdit={(target) => setDialog({ mode: "edit", organizationId: target.id })}
+                onDelete={(target) => setDialog({ mode: "delete", organizationId: target.id })}
               />
             ))}
           </div>
@@ -446,14 +188,23 @@ export function OrganizationManagement() {
               </EmptyDescription>
             </EmptyHeader>
             <EmptyContent>
-              <Button type="button" size="sm" className="gap-2" onClick={openCreateForm}>
+              <Button type="button" size="sm" className="gap-2" onClick={() => setDialog({ mode: "create" })}>
                 <Plus className="size-3.5" />
-                Create organization
+                New organization
               </Button>
             </EmptyContent>
           </Empty>
         )}
       </section>
+
+      <OrganizationManagementDialog
+        state={dialog}
+        organization={dialogOrganization}
+        isSaving={isSaving}
+        onClose={() => setDialog(null)}
+        onSave={handleSave}
+        onDelete={handleDelete}
+      />
     </div>
   );
 }
