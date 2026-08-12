@@ -69,3 +69,45 @@ Convex agent skills for common tasks can be installed by running
 `npx convex ai-files install`.
 
 <!-- convex-ai-end -->
+
+<!-- management-dialog-standard-start -->
+
+# Data Management UI Standard
+
+Use the shared `@better-convex-stack/ui/components/dialog` for every flow that
+creates, updates, invites, assigns, or removes data. This applies to workspace,
+member, organization, admin, and future CRUD surfaces.
+
+- Keep the page, list, and toolbar mounted. Open forms and destructive
+  confirmations from stable buttons inside a dialog instead of inserting forms
+  into page flow.
+- Compose dialogs with `Dialog`, `DialogContent`, `DialogHeader`,
+  `DialogTitle`, `DialogDescription`, `DialogFooter`, and `DialogClose`.
+- Structure every data-entry dialog as `DialogHeader`, a padded form, and a
+  sibling `DialogFooter`. Never nest `DialogFooter` inside a form: a padded form
+  plus a padded footer creates a double right/bottom inset. Give the form a
+  stable `id` and connect its external submit button with `form="..."`.
+- Keep feature containers focused on data orchestration. If a component grows
+  beyond roughly 500 lines or owns multiple flows, extract presentation into
+  named subcomponent files (for example list, row, loading, and dialog files)
+  and move reusable formatting, parsing, and validation helpers into a nearby
+  `*-utils.ts` or `*-types.ts` file. The container should compose those pieces,
+  not define a second UI system inline.
+- Pad form content with `px-5 pt-5 sm:px-6 sm:pt-6`; leave the form bottom
+  open so the shared `DialogFooter` owns the single horizontal and bottom inset.
+  Keep that footer padding intact. The shared footer owns protected `!px-5
+  !py-5 sm:!px-6 sm:!py-6` spacing for every dialog. Do not use `p-0`, negative
+  margins, or `border-t-0` on a footer unless a deliberate edge-to-edge
+  treatment is documented and visually verified.
+- Use real native button semantics through the shared `Button` component, and
+  use `render` only when a control is intentionally rendered as a link or
+  another compatible element.
+- Use clear action labels: `New organization`, `Add member`, `Invite member`,
+  `Save changes`, and `Remove member`. Avoid internal implementation terms in
+  visible copy.
+- Keep loading inside the stable shell. Use skeletons that match the final
+  geometry and replace only the data region that is still pending.
+- After changing a shared dialog or data-management flow, run the UI/web type
+  checks, oxlint, and the production web build.
+
+<!-- management-dialog-standard-end -->

@@ -56,5 +56,32 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
   Prefer `loading.tsx`, `Suspense`, `use cache`, and prefetched `Link`s for
   instant navigation. `export const instant = false` is an explicit last
   resort, not a default route setting.
+- Treat dynamic route data as request-bound. Never read `params` or
+  `searchParams` in the route component body before a `Suspense` boundary.
+  Return a static page shell that wraps a child component in `Suspense`, then
+  await the child component's `params` or read `useSearchParams()` inside that
+  boundary. Apply the same pattern to all `[param]` pages, including public
+  invitation and blog routes.
 - Keep route pages as Server Components unless an interaction requires a
   client island. Do not add `memo` or `useMemo` without profiling evidence.
+
+## Management UI
+
+- Use the shared `@better-convex-stack/ui/components/dialog` for create, edit,
+  invite, and destructive confirmation flows in organization and admin
+  management surfaces. Keep the list or page shell mounted while an action is
+  open so forms do not create layout shift.
+- Keep management containers small and compositional. Move large list rows,
+  loading states, and dialog forms into separate named files, and keep helpers
+  and shared types in nearby `*-utils.ts` and `*-types.ts` modules. Treat 500
+  lines as a refactoring signal rather than adding more conditionals to the
+  container.
+- Keep `DialogFooter` as a sibling after the padded form, never nested inside
+  it. Give the form an `id` and use the external submit button's `form`
+  attribute so every dialog has one consistent right and bottom inset.
+- Keep data loading inside stable shells. Skeleton rows should match the final
+  list geometry, and a pending Better Auth/Convex query should replace only
+  the data region that is still loading rather than the whole page heading.
+- Prefer plain action labels such as `New organization`, `Add member`,
+  `Invite member`, `Save changes`, and `Remove member`. Avoid internal terms
+  such as `provision` in user-facing controls.
