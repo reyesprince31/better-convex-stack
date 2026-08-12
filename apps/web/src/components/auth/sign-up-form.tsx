@@ -35,8 +35,8 @@ export default function SignUpForm() {
         },
         {
           onSuccess: () => {
-            toast.success("Account created successfully");
-            router.replace(redirectTo as Route);
+            toast.success("Check your email to verify your account");
+            router.replace(getAuthRouteHref("/login", redirectTo) as Route);
           },
           onError: (error) => {
             toast.error(
