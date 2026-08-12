@@ -1,7 +1,6 @@
 import { ArrowUpRight, type LucideIcon } from "lucide-react";
 import Link from "next/link";
-
-import type { MockOrganization } from "@/lib/mock-workspace";
+import type * as React from "react";
 
 export function OrganizationResourcePage({
   organization,
@@ -10,7 +9,7 @@ export function OrganizationResourcePage({
   icon: Icon,
   children,
 }: {
-  organization: MockOrganization;
+  organization: { name: string; slug: string };
   title: string;
   description: string;
   icon: LucideIcon;

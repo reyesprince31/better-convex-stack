@@ -30,7 +30,7 @@ type SidebarKind = "admin" | "organization";
 const organizationLinks = [
   { label: "Overview", path: "", icon: LayoutDashboard },
   { label: "Projects", path: "/projects", icon: FolderKanban },
-  { label: "People", path: "/members", icon: Users },
+  { label: "Members", path: "/members", icon: Users },
   { label: "Settings", path: "/settings", icon: Settings2 },
 ] as const;
 

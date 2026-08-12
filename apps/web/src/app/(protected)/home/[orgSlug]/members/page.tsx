@@ -1,19 +1,41 @@
-import { Users } from "lucide-react";
-import { use } from "react";
+import { Suspense } from "react";
 
-import { OrganizationResourcePage } from "@/components/organization/organization-resource-page";
-import { getMockOrganization } from "@/lib/mock-workspace";
+import { OrganizationMembersView } from "@/components/organization/organization-members-view";
 
-export default function OrganizationMembersPage({ params }: { params: Promise<{ orgSlug: string }> }) {
-  const organization = getMockOrganization(use(params).orgSlug);
-
+export default function OrganizationMembersPage({
+  params,
+}: {
+  params: Promise<{ orgSlug: string }>;
+}) {
   return (
-    <OrganizationResourcePage organization={organization} title="People" description="See who is contributing to this workspace and where they focus." icon={Users}>
-      <div className="grid gap-3 sm:grid-cols-2">
-        {organization.members.map((member) => (
-          <div key={member.name} className="flex items-center gap-3 border border-border/70 bg-background p-4"><span className="flex size-9 items-center justify-center rounded-full bg-foreground text-xs font-medium text-background">{member.initials}</span><div><p className="text-sm font-medium">{member.name}</p><p className="mt-1 text-xs text-muted-foreground">{member.role}</p></div></div>
-        ))}
+    <Suspense fallback={<MembersPageLoading />}>
+      <OrganizationMembersContent params={params} />
+    </Suspense>
+  );
+}
+
+async function OrganizationMembersContent({
+  params,
+}: {
+  params: Promise<{ orgSlug: string }>;
+}) {
+  const { orgSlug } = await params;
+  return <OrganizationMembersView orgSlug={orgSlug} />;
+}
+
+function MembersPageLoading() {
+  return (
+    <div className="space-y-8" aria-label="Loading organization members">
+      <section className="space-y-3 border-b border-border/70 pb-8">
+        <div className="h-3 w-44 animate-pulse bg-muted" />
+        <div className="h-12 w-64 animate-pulse bg-muted" />
+        <div className="h-4 w-[30rem] max-w-full animate-pulse bg-muted" />
+      </section>
+      <div className="h-24 animate-pulse bg-muted" />
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.25fr)_minmax(18rem,0.75fr)]">
+        <div className="h-80 animate-pulse bg-muted" />
+        <div className="h-80 animate-pulse bg-muted" />
       </div>
-    </OrganizationResourcePage>
+    </div>
   );
 }

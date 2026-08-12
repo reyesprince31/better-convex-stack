@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 
 import { AuthModeSwitcher } from "@/components/auth/auth-mode-switcher";
 
@@ -35,7 +36,9 @@ export default function AuthPage({ initialMode }: { initialMode: "sign-in" | "si
               Orbit
             </Link>
           </div>
-          <AuthModeSwitcher initialMode={initialMode} />
+          <Suspense fallback={<div className="h-64 animate-pulse bg-muted" />}>
+            <AuthModeSwitcher initialMode={initialMode} />
+          </Suspense>
         </div>
       </section>
     </main>

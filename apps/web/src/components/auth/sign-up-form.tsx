@@ -4,13 +4,20 @@ import { Button } from "@better-convex-stack/ui/components/button";
 import { Input } from "@better-convex-stack/ui/components/input";
 import { Label } from "@better-convex-stack/ui/components/label";
 import { useForm } from "@tanstack/react-form";
+import type { Route } from "next";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import z from "zod";
 
 import { authClient } from "@/lib/auth-client";
 
-export default function SignUpForm({ onSwitchToSignIn }: { onSwitchToSignIn: () => void }) {
+export default function SignUpForm({
+  onSwitchToSignIn,
+  redirectTo,
+}: {
+  onSwitchToSignIn: () => void;
+  redirectTo: string;
+}) {
   const router = useRouter();
 
   const form = useForm({
@@ -28,7 +35,7 @@ export default function SignUpForm({ onSwitchToSignIn }: { onSwitchToSignIn: () 
         },
         {
           onSuccess: () => {
-            router.push("/home");
+            router.push(redirectTo as Route);
             toast.success("Sign up successful");
           },
           onError: (error) => {

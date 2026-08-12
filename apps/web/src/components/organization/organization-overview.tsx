@@ -1,5 +1,10 @@
 "use client";
 
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@better-convex-stack/ui/components/avatar";
 import { Button } from "@better-convex-stack/ui/components/button";
 import {
   Empty,
@@ -10,9 +15,11 @@ import {
   EmptyTitle,
 } from "@better-convex-stack/ui/components/empty";
 import { Skeleton } from "@better-convex-stack/ui/components/skeleton";
-import { ArrowUpRight, Building2, Check, Users } from "lucide-react";
+import { ArrowUpRight, Building2, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { useQuery } from "convex/react";
+import { api } from "@better-convex-stack/backend/convex/_generated/api";
 
 import { authClient } from "@/lib/auth-client";
 
@@ -24,6 +31,13 @@ export function OrganizationOverview({ orgSlug }: { orgSlug: string }) {
   const organization = organizationsQuery.data?.find((item) => item.slug === orgSlug);
   const activeOrganization =
     activeOrganizationQuery.data?.id === organization?.id ? activeOrganizationQuery.data : null;
+
+  const convexMembersSummary = useQuery(
+    api.organizations.getMyOrganizationsMembers,
+    organization?.id ? { organizationIds: [organization.id] } : "skip"
+  );
+
+  const convexOrgData = convexMembersSummary?.[0];
 
   useEffect(() => {
     if (
@@ -43,7 +57,7 @@ export function OrganizationOverview({ orgSlug }: { orgSlug: string }) {
       });
   }, [activeOrganizationQuery.data?.id, activeOrganizationQuery.isPending, organization]);
 
-  if (organizationsQuery.isPending || (organization && activeOrganizationQuery.isPending)) {
+  if (organizationsQuery.isPending || (organization && activeOrganizationQuery.isPending && !convexOrgData)) {
     return (
       <div className="space-y-8" aria-label="Loading organization workspace">
         <section className="border-b border-border/70 pb-8">
@@ -90,8 +104,17 @@ export function OrganizationOverview({ orgSlug }: { orgSlug: string }) {
     );
   }
 
-  const members = activeOrganization?.members ?? [];
-  const ownerCount = members.filter((member) => member.role === "owner").length;
+  const betterAuthMembers = activeOrganization?.members ?? [];
+  const memberCount =
+    betterAuthMembers.length > 0
+      ? betterAuthMembers.length
+      : convexOrgData?.memberCount ?? 1;
+
+  const ownerCount =
+    betterAuthMembers.length > 0
+      ? betterAuthMembers.filter((m) => m.role === "owner").length
+      : convexOrgData?.members.filter((m) => m.role === "owner").length ?? 1;
+
   const createdDate = new Date(organization.createdAt).toLocaleDateString(undefined, {
     dateStyle: "medium",
   });
@@ -127,12 +150,12 @@ export function OrganizationOverview({ orgSlug }: { orgSlug: string }) {
         {[
           {
             label: "Members",
-            value: activeOrganization ? String(members.length) : "...",
-            note: "People with access",
+            value: String(memberCount),
+            note: "Team members with access",
           },
           {
             label: "Owners",
-            value: activeOrganization ? String(ownerCount) : "...",
+            value: String(ownerCount),
             note: "Accountable for this workspace",
           },
           { label: "Created", value: createdDate, note: `/${organization.slug}` },
@@ -152,35 +175,84 @@ export function OrganizationOverview({ orgSlug }: { orgSlug: string }) {
           <div className="flex items-center justify-between border-b border-border/70 px-5 py-4">
             <div>
               <p className="font-mono text-[10px] tracking-[0.16em] text-muted-foreground uppercase">
-                People
+                Members
               </p>
-              <h2 className="mt-1 text-sm font-medium">Who can work here</h2>
+              <h2 className="mt-1 text-sm font-medium">Team members in this workspace</h2>
             </div>
-            <Users className="size-4 text-muted-foreground" />
+            <Link
+              href={`/home/${organization.slug}/members`}
+              className="flex items-center gap-1 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <span>View all</span>
+              <ArrowUpRight className="size-3.5" />
+            </Link>
           </div>
-          {members.length ? (
+          {betterAuthMembers.length > 0 ? (
             <div>
-              {members.slice(0, 5).map((member) => (
+              {betterAuthMembers.slice(0, 5).map((member) => (
                 <div
                   key={member.id}
                   className="flex items-center justify-between gap-4 border-b border-border/70 px-5 py-4 last:border-b-0"
                 >
                   <div className="flex min-w-0 items-center gap-3">
-                    <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-muted font-mono text-[10px] font-medium">
-                      {member.user.name.slice(0, 2).toUpperCase()}
-                    </span>
+                    <Avatar size="sm">
+                      {member.user.image ? (
+                        <AvatarImage src={member.user.image} alt={member.user.name} />
+                      ) : null}
+                      <AvatarFallback className="text-[10px]">
+                        {member.user.name
+                          .split(" ")
+                          .map((p) => p[0])
+                          .filter(Boolean)
+                          .slice(0, 2)
+                          .join("")
+                          .toUpperCase() || member.user.name.slice(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
                     <div className="min-w-0">
                       <p className="truncate text-sm font-medium">{member.user.name}</p>
-                      <p className="mt-1 truncate text-xs text-muted-foreground">
+                      <p className="mt-0.5 truncate text-xs text-muted-foreground">
                         {member.user.email}
                       </p>
                     </div>
                   </div>
                   <span className="flex shrink-0 items-center gap-1.5 text-xs text-muted-foreground">
                     {member.role === "owner" ? (
-                      <Check className="size-3.5 text-emerald-500" />
+                      <ShieldCheck className="size-3.5 text-emerald-500" />
                     ) : null}
-                    {member.role}
+                    <span className="capitalize">{member.role}</span>
+                  </span>
+                </div>
+              ))}
+            </div>
+          ) : convexOrgData?.members && convexOrgData.members.length > 0 ? (
+            <div>
+              {convexOrgData.members.slice(0, 5).map((member) => (
+                <div
+                  key={member.id}
+                  className="flex items-center justify-between gap-4 border-b border-border/70 px-5 py-4 last:border-b-0"
+                >
+                  <div className="flex min-w-0 items-center gap-3">
+                    <Avatar size="sm">
+                      {member.image ? (
+                        <AvatarImage src={member.image} alt={member.name} />
+                      ) : null}
+                      <AvatarFallback className="text-[10px]">
+                        {member.initials}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium">{member.name}</p>
+                      <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                        {member.email}
+                      </p>
+                    </div>
+                  </div>
+                  <span className="flex shrink-0 items-center gap-1.5 text-xs text-muted-foreground">
+                    {member.role === "owner" ? (
+                      <ShieldCheck className="size-3.5 text-emerald-500" />
+                    ) : null}
+                    <span className="capitalize">{member.role}</span>
                   </span>
                 </div>
               ))}

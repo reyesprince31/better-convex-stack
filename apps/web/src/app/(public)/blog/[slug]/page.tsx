@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { use } from "react";
+import { Suspense } from "react";
 
 import { getPost, posts } from "@/lib/blog";
 
@@ -13,7 +13,15 @@ export function generateStaticParams() {
 export const metadata: Metadata = { title: "Journal" };
 
 export default function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = use(params);
+  return (
+    <Suspense fallback={<BlogPostLoading />}>
+      <BlogPostContent params={params} />
+    </Suspense>
+  );
+}
+
+async function BlogPostContent({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   const post = getPost(slug);
 
   if (!post) {
@@ -40,6 +48,19 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
             </section>
           ))}
         </div>
+      </article>
+    </main>
+  );
+}
+
+function BlogPostLoading() {
+  return (
+    <main className="mx-auto w-full max-w-7xl px-5 pb-24 pt-16 sm:px-8 sm:pt-24" aria-label="Loading journal entry">
+      <div className="h-4 w-28 animate-pulse bg-muted" />
+      <article className="mx-auto mt-20 max-w-3xl">
+        <div className="h-3 w-40 animate-pulse bg-muted" />
+        <div className="mt-6 h-24 w-full animate-pulse bg-muted" />
+        <div className="mt-14 h-24 w-full animate-pulse bg-muted" />
       </article>
     </main>
   );
