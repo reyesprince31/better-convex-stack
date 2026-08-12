@@ -2,10 +2,12 @@ import { getSessionCookie } from "better-auth/cookies";
 import { type NextRequest, NextResponse } from "next/server";
 
 const protectedPrefixes = ["/admin", "/home", "/dashboard"];
-const authRoutes = ["/sign-in", "/sign-up"];
+const authRoutes = ["/login", "/signup", "/sign-in", "/sign-up"];
 
 function isProtectedPath(pathname: string) {
-  return protectedPrefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
+  return protectedPrefixes.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+  );
 }
 
 export function proxy(request: NextRequest) {
@@ -15,7 +17,7 @@ export function proxy(request: NextRequest) {
   // This is an optimistic redirect only. The protected layout performs the
   // authoritative Better Auth/Convex check before rendering private content.
   if (isProtectedPath(pathname) && !hasSessionCookie) {
-    const signInUrl = new URL("/sign-in", request.url);
+    const signInUrl = new URL("/login", request.url);
     signInUrl.searchParams.set("redirect", `${pathname}${search}`);
     return NextResponse.redirect(signInUrl);
   }
@@ -28,5 +30,13 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/home/:path*", "/dashboard/:path*", "/sign-in", "/sign-up"],
+  matcher: [
+    "/admin/:path*",
+    "/home/:path*",
+    "/dashboard/:path*",
+    "/login",
+    "/signup",
+    "/sign-in",
+    "/sign-up",
+  ],
 };

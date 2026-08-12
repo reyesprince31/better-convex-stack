@@ -5,25 +5,25 @@ import { Input } from "@better-convex-stack/ui/components/input";
 import { Label } from "@better-convex-stack/ui/components/label";
 import { useForm } from "@tanstack/react-form";
 import type { Route } from "next";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import z from "zod";
 
+import AuthFormShell from "@/components/auth/auth-form-shell";
+import { getAuthRouteHref, getSafeRedirect } from "@/components/auth/auth-redirect";
 import { authClient } from "@/lib/auth-client";
 
-export default function SignUpForm({
-  onSwitchToSignIn,
-  redirectTo,
-}: {
-  onSwitchToSignIn: () => void;
-  redirectTo: string;
-}) {
+export default function SignUpForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = getSafeRedirect(searchParams.get("redirect"));
 
   const form = useForm({
     defaultValues: {
       email: "",
       password: "",
+      confirmPassword: "",
       name: "",
     },
     onSubmit: async ({ value }) => {
@@ -35,124 +35,176 @@ export default function SignUpForm({
         },
         {
           onSuccess: () => {
-            router.push(redirectTo as Route);
-            toast.success("Sign up successful");
+            toast.success("Account created successfully");
+            router.replace(redirectTo as Route);
           },
           onError: (error) => {
-            toast.error(error.error.message || error.error.statusText);
+            toast.error(
+              error.error.message || error.error.statusText || "Unable to create account",
+            );
           },
         },
       );
     },
     validators: {
-      onSubmit: z.object({
-        name: z.string().min(2, "Name must be at least 2 characters"),
-        email: z.email("Invalid email address"),
-        password: z.string().min(8, "Password must be at least 8 characters"),
-      }),
+      onSubmit: z
+        .object({
+          name: z.string().min(2, "Name must be at least 2 characters"),
+          email: z.email("Enter a valid email address"),
+          password: z.string().min(8, "Password must be at least 8 characters"),
+          confirmPassword: z.string().min(1, "Confirm your password"),
+        })
+        .refine((value) => value.password === value.confirmPassword, {
+          message: "Passwords do not match",
+          path: ["confirmPassword"],
+        }),
     },
   });
 
   return (
-    <div className="mx-auto w-full mt-10 max-w-md p-6">
-      <h1 className="mb-6 text-center text-3xl font-bold">Create Account</h1>
-
+    <AuthFormShell
+      title="Create your account"
+      description="Start with a clear place for your team to work."
+      footer={
+        <p className="text-center text-xs text-muted-foreground">
+          Already have an account?{" "}
+          <Link
+            href={getAuthRouteHref("/login", redirectTo)}
+            className="font-medium text-foreground underline underline-offset-4 hover:text-primary"
+          >
+            Log in
+          </Link>
+        </p>
+      }
+    >
       <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          form.handleSubmit();
+        onSubmit={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          void form.handleSubmit();
         }}
-        className="space-y-4"
+        className="space-y-5"
       >
-        <div>
-          <form.Field name="name">
-            {(field) => (
-              <div className="space-y-2">
-                <Label htmlFor={field.name}>Name</Label>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                />
-                {field.state.meta.errors.map((error) => (
-                  <p key={error?.message} className="text-red-500">
-                    {error?.message}
-                  </p>
-                ))}
-              </div>
-            )}
-          </form.Field>
-        </div>
+        <form.Field name="name">
+          {(field) => (
+            <div className="space-y-2">
+              <Label htmlFor={field.name}>Name</Label>
+              <Input
+                id={field.name}
+                name={field.name}
+                autoComplete="name"
+                required
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(event) => field.handleChange(event.target.value)}
+                aria-invalid={field.state.meta.errors.length > 0}
+              />
+              {field.state.meta.errors.map((error, index) => (
+                <p
+                  key={`${error?.message ?? "name-error"}-${index}`}
+                  className="text-xs text-destructive"
+                >
+                  {error?.message}
+                </p>
+              ))}
+            </div>
+          )}
+        </form.Field>
 
-        <div>
-          <form.Field name="email">
-            {(field) => (
-              <div className="space-y-2">
-                <Label htmlFor={field.name}>Email</Label>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  type="email"
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                />
-                {field.state.meta.errors.map((error) => (
-                  <p key={error?.message} className="text-red-500">
-                    {error?.message}
-                  </p>
-                ))}
-              </div>
-            )}
-          </form.Field>
-        </div>
+        <form.Field name="email">
+          {(field) => (
+            <div className="space-y-2">
+              <Label htmlFor={field.name}>Email</Label>
+              <Input
+                id={field.name}
+                name={field.name}
+                type="email"
+                autoComplete="email"
+                required
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(event) => field.handleChange(event.target.value)}
+                aria-invalid={field.state.meta.errors.length > 0}
+              />
+              {field.state.meta.errors.map((error, index) => (
+                <p
+                  key={`${error?.message ?? "email-error"}-${index}`}
+                  className="text-xs text-destructive"
+                >
+                  {error?.message}
+                </p>
+              ))}
+            </div>
+          )}
+        </form.Field>
 
-        <div>
-          <form.Field name="password">
-            {(field) => (
-              <div className="space-y-2">
-                <Label htmlFor={field.name}>Password</Label>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  type="password"
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                />
-                {field.state.meta.errors.map((error) => (
-                  <p key={error?.message} className="text-red-500">
-                    {error?.message}
-                  </p>
-                ))}
-              </div>
-            )}
-          </form.Field>
-        </div>
+        <form.Field name="password">
+          {(field) => (
+            <div className="space-y-2">
+              <Label htmlFor={field.name}>Password</Label>
+              <Input
+                id={field.name}
+                name={field.name}
+                type="password"
+                autoComplete="new-password"
+                required
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(event) => field.handleChange(event.target.value)}
+                aria-invalid={field.state.meta.errors.length > 0}
+              />
+              {field.state.meta.errors.map((error, index) => (
+                <p
+                  key={`${error?.message ?? "password-error"}-${index}`}
+                  className="text-xs text-destructive"
+                >
+                  {error?.message}
+                </p>
+              ))}
+            </div>
+          )}
+        </form.Field>
+
+        <form.Field name="confirmPassword">
+          {(field) => (
+            <div className="space-y-2">
+              <Label htmlFor={field.name}>Confirm password</Label>
+              <Input
+                id={field.name}
+                name={field.name}
+                type="password"
+                autoComplete="new-password"
+                required
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(event) => field.handleChange(event.target.value)}
+                aria-invalid={field.state.meta.errors.length > 0}
+              />
+              <p className="text-xs text-muted-foreground">
+                Use the same password to confirm your account.
+              </p>
+              {field.state.meta.errors.map((error, index) => (
+                <p
+                  key={`${error?.message ?? "confirm-password-error"}-${index}`}
+                  className="text-xs text-destructive"
+                >
+                  {error?.message}
+                </p>
+              ))}
+            </div>
+          )}
+        </form.Field>
 
         <form.Subscribe
           selector={(state) => ({ canSubmit: state.canSubmit, isSubmitting: state.isSubmitting })}
         >
           {({ canSubmit, isSubmitting }) => (
-            <Button type="submit" className="w-full" disabled={!canSubmit || isSubmitting}>
-              {isSubmitting ? "Submitting..." : "Sign Up"}
+            <Button type="submit" className="h-10 w-full" disabled={!canSubmit || isSubmitting}>
+              {isSubmitting ? "Creating account..." : "Create account"}
             </Button>
           )}
         </form.Subscribe>
       </form>
-
-      <div className="mt-4 text-center">
-        <Button
-          variant="link"
-          onClick={onSwitchToSignIn}
-          className="text-indigo-600 hover:text-indigo-800"
-        >
-          Already have an account? Sign In
-        </Button>
-      </div>
-    </div>
+    </AuthFormShell>
   );
 }

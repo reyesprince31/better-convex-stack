@@ -4,6 +4,7 @@ import { Button } from "@better-convex-stack/ui/components/button";
 import { Skeleton } from "@better-convex-stack/ui/components/skeleton";
 import { ArrowRight, Building2, Check, ShieldCheck } from "lucide-react";
 import Link from "next/link";
+import type { Route } from "next";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -115,13 +116,13 @@ export function AcceptInvitationView() {
       >
         <div className="flex flex-col gap-2 sm:flex-row sm:justify-center">
           <Button
-            render={<Link href={`/sign-in?redirect=${encodeURIComponent(redirectPath)}`} />}
+            render={<Link href={`/login?redirect=${encodeURIComponent(redirectPath)}` as Route} />}
             nativeButton={false}
           >
             Sign in <ArrowRight className="size-3.5" />
           </Button>
           <Button
-            render={<Link href={`/sign-up?redirect=${encodeURIComponent(redirectPath)}`} />}
+            render={<Link href={`/signup?redirect=${encodeURIComponent(redirectPath)}` as Route} />}
             nativeButton={false}
             variant="outline"
           >

@@ -1,11 +1,12 @@
 import { api } from "@better-convex-stack/backend/convex/_generated/api";
 import { redirect } from "next/navigation";
+import type { Route } from "next";
 
 import { fetchAuthQuery, isAuthenticated } from "@/lib/auth-server";
 
 export async function requireAuth() {
   if (!(await isAuthenticated())) {
-    redirect("/sign-in");
+    redirect("/login" as Route);
   }
 }
 

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Route } from "next";
 
 import { ModeToggle } from "@/components/theme/mode-toggle";
 
@@ -31,7 +32,7 @@ export function PublicNav() {
         <div className="flex items-center gap-2">
           <ModeToggle />
           <Link
-            href="/sign-in"
+            href={"/login" as Route}
             className="inline-flex h-8 items-center justify-center bg-foreground px-3 text-xs font-medium text-background transition-opacity hover:opacity-80"
           >
             Sign in

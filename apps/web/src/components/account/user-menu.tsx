@@ -161,7 +161,7 @@ export default function UserMenu({
             authClient.signOut({
               fetchOptions: {
                 onSuccess: () => {
-                  window.location.replace("/sign-in");
+                  window.location.replace("/login");
                 },
               },
             });
