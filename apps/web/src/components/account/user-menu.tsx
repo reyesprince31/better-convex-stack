@@ -14,6 +14,7 @@ import {
 } from "@better-convex-stack/ui/components/dropdown-menu";
 import { useQuery } from "convex/react";
 import {
+  Building2,
   Check,
   ChevronDown,
   Home,
@@ -38,16 +39,25 @@ const themeOptions = [
   { value: "system", label: "System", icon: Monitor },
 ] as const;
 
+const personalNavigation = [
+  { href: "/home" as Route, label: "Overview", icon: Home },
+  { href: "/home/organizations" as Route, label: "Organizations", icon: Building2 },
+  { href: "/home/invitations" as Route, label: "Invitations", icon: MailCheck },
+  { href: "/home/settings" as Route, label: "Settings", icon: Settings2 },
+] as const;
+
 export default function UserMenu({
   className,
   side = "right",
   align = "start",
   showIdentity = true,
+  showPersonalNavigation = false,
 }: {
   className?: string;
   side?: "bottom" | "left" | "right" | "top";
   align?: "center" | "end" | "start";
   showIdentity?: boolean;
+  showPersonalNavigation?: boolean;
 } = {}) {
   const pathname = usePathname();
   const user = useQuery(api.auth.getCurrentUser);
@@ -106,7 +116,9 @@ export default function UserMenu({
                 ? `group h-12 w-full justify-start gap-3 px-2 ${className ?? ""}`
                 : `group size-8 justify-center p-0 ${className ?? ""}`
             }
-            aria-label="Open account menu"
+            aria-label={
+              showPersonalNavigation ? "Open account and navigation menu" : "Open account menu"
+            }
           />
         }
       >
@@ -138,6 +150,34 @@ export default function UserMenu({
           </DropdownMenuLabel>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
+        {showPersonalNavigation ? (
+          <>
+            <DropdownMenuGroup className="md:hidden">
+              <DropdownMenuLabel>Navigation</DropdownMenuLabel>
+              {personalNavigation.map((item) => {
+                const Icon = item.icon;
+                const isActive =
+                  item.href === "/home"
+                    ? pathname === item.href
+                    : pathname === item.href || pathname.startsWith(`${item.href}/`);
+
+                return (
+                  <DropdownMenuItem
+                    key={item.href}
+                    render={<Link href={item.href} />}
+                    className={isActive ? "bg-accent text-accent-foreground" : undefined}
+                    aria-current={isActive ? "page" : undefined}
+                  >
+                    <Icon />
+                    {item.label}
+                    {isActive ? <Check className="ml-auto size-3.5" /> : null}
+                  </DropdownMenuItem>
+                );
+              })}
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator className="md:hidden" />
+          </>
+        ) : null}
         <DropdownMenuGroup>
           <DropdownMenuLabel>Appearance</DropdownMenuLabel>
           {themeOptions.map((option) => {
@@ -164,11 +204,17 @@ export default function UserMenu({
             <DropdownMenuSeparator />
           </>
         ) : null}
-        <DropdownMenuItem render={<Link href="/home/invitations" />}>
+        <DropdownMenuItem
+          className={showPersonalNavigation ? "hidden md:flex" : undefined}
+          render={<Link href="/home/invitations" />}
+        >
           <MailCheck />
           Invitations
         </DropdownMenuItem>
-        <DropdownMenuItem render={<Link href="/home/settings" />}>
+        <DropdownMenuItem
+          className={showPersonalNavigation ? "hidden md:flex" : undefined}
+          render={<Link href="/home/settings" />}
+        >
           <Settings2 />
           Account settings
         </DropdownMenuItem>

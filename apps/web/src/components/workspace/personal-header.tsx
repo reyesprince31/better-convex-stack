@@ -43,13 +43,14 @@ export function PersonalHeader() {
           <Button
             variant="ghost"
             size="icon"
-            render={<Link href="/home/settings?section=notifications" />}
+            className="rounded-lg"
+            render={<Link href="/home/settings?tab=notifications" />}
             aria-label="Notifications"
             title="Notifications"
           >
             <Bell />
           </Button>
-          <UserMenu showIdentity={false} side="bottom" align="end" />
+          <UserMenu showIdentity={false} showPersonalNavigation side="bottom" align="end" />
         </div>
       </div>
     </header>
