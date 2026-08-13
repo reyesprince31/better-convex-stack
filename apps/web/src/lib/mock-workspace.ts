@@ -84,6 +84,12 @@ export const mockOrganizations: MockOrganization[] = [
   },
 ];
 
+export const mockOrganizationInvoices = [
+  { id: "INV-2026-008", date: "Aug 1, 2026", amount: "$29.00", status: "Paid" },
+  { id: "INV-2026-007", date: "Jul 1, 2026", amount: "$29.00", status: "Paid" },
+  { id: "INV-2026-006", date: "Jun 1, 2026", amount: "$29.00", status: "Paid" },
+] as const;
+
 // Keep this function as the route data boundary. Convex-backed loaders can
 // replace it later without changing the workspace page and navigation shapes.
 export function getMockOrganization(slug: string): MockOrganization {

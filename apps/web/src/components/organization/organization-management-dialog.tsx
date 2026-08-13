@@ -28,7 +28,7 @@ type OrganizationManagementDialogProps = {
   isSaving: boolean;
   onClose: () => void;
   onSave: (values: OrganizationFormValues) => Promise<void>;
-  onDelete: () => Promise<void>;
+  onDelete?: () => Promise<void>;
 };
 
 export function OrganizationManagementDialog({
@@ -43,18 +43,21 @@ export function OrganizationManagementDialog({
   const [slug, setSlug] = useState("");
   const [slugWasEdited, setSlugWasEdited] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [deleteConfirmation, setDeleteConfirmation] = useState("");
 
   useEffect(() => {
     setName(organization?.name ?? "");
     setSlug(organization?.slug ?? "");
     setSlugWasEdited(Boolean(organization));
     setFormError(null);
+    setDeleteConfirmation("");
   }, [organization?.id, state?.mode]);
 
   if (!state) return null;
 
   const isDelete = state.mode === "delete";
   const isEditing = state.mode === "edit";
+  const expectedDeleteConfirmation = organization?.slug ?? "";
 
   async function handleSubmit(event: React.SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -86,15 +89,42 @@ export function OrganizationManagementDialog({
         if (!open && !isSaving) onClose();
       }}
     >
-      <DialogContent>
+      <DialogContent className="rounded-none">
         {isDelete ? (
           <>
             <DialogHeader>
               <DialogTitle>Delete organization?</DialogTitle>
               <DialogDescription>
-                {organization?.name ?? "This organization"} will be removed with its membership records.
+                {organization?.name ?? "This organization"} will be removed with its membership
+                records, invitations, and organization data. This cannot be undone.
               </DialogDescription>
             </DialogHeader>
+            <form
+              id="delete-organization-form"
+              className="grid gap-2 px-5 pt-5 sm:px-6 sm:pt-6"
+              onSubmit={(event) => {
+                event.preventDefault();
+                if (deleteConfirmation === expectedDeleteConfirmation && onDelete) {
+                  void onDelete();
+                }
+              }}
+            >
+              <Label htmlFor="delete-organization-confirmation">
+                Type{" "}
+                <span className="font-semibold text-foreground">{expectedDeleteConfirmation}</span>{" "}
+                to confirm
+              </Label>
+              <Input
+                id="delete-organization-confirmation"
+                value={deleteConfirmation}
+                onChange={(event) => setDeleteConfirmation(event.target.value)}
+                placeholder={expectedDeleteConfirmation}
+                autoComplete="off"
+                disabled={isSaving}
+                autoFocus
+                required
+              />
+            </form>
             <DialogFooter>
               <DialogClose
                 render={
@@ -104,10 +134,15 @@ export function OrganizationManagementDialog({
                 }
               />
               <Button
-                type="button"
+                type="submit"
+                form="delete-organization-form"
                 variant="destructive"
-                disabled={isSaving}
-                onClick={() => void onDelete()}
+                disabled={
+                  isSaving ||
+                  !onDelete ||
+                  !expectedDeleteConfirmation ||
+                  deleteConfirmation !== expectedDeleteConfirmation
+                }
               >
                 {isSaving ? "Deleting…" : "Delete organization"}
               </Button>

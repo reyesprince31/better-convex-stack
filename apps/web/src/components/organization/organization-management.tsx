@@ -10,7 +10,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@better-convex-stack/ui/components/empty";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { Building2, Plus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -29,6 +29,7 @@ import { OrganizationRow } from "./organization-row";
 export function OrganizationManagement() {
   const organizationsQuery = authClient.useListOrganizations();
   const activeOrganizationQuery = authClient.useActiveOrganization();
+  const deleteOwnedOrganization = useMutation(api.organizations.deleteOwnedOrganization);
   const organizations = organizationsQuery.data ?? [];
   const organizationsMembers = useQuery(
     api.organizations.getMyOrganizationsMembers,
@@ -93,11 +94,7 @@ export function OrganizationManagement() {
         }
       }
 
-      const { error } = await authClient.organization.delete({ organizationId: organization.id });
-
-      if (error) {
-        throw new Error(getErrorMessage(error, "The organization could not be deleted."));
-      }
+      await deleteOwnedOrganization({ organizationId: organization.id });
 
       setDialog(null);
       toast.success("Organization deleted");

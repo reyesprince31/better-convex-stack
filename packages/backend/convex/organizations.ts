@@ -1,7 +1,38 @@
-import { query } from "./_generated/server";
+import type { MutationCtx } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 import { authComponent, createAuth } from "./auth";
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import { components } from "./_generated/api";
+import { writeAuditLog } from "./audit";
+
+const SENSITIVE_OPERATION_FRESH_AGE_MS = 15 * 60 * 1000;
+
+async function requireFreshUser(ctx: MutationCtx) {
+  const user = await authComponent.safeGetAuthUser(ctx);
+  if (!user) {
+    throw new ConvexError({ code: "UNAUTHENTICATED", message: "Authentication required." });
+  }
+
+  const { auth, headers } = await authComponent.getAuth(createAuth, ctx);
+  const session = await auth.api.getSession({
+    headers,
+    query: { disableCookieCache: true, disableRefresh: true },
+  });
+  const createdAt = session ? new Date(session.session.createdAt).getTime() : Number.NaN;
+
+  if (
+    !session ||
+    !Number.isFinite(createdAt) ||
+    Date.now() - createdAt >= SENSITIVE_OPERATION_FRESH_AGE_MS
+  ) {
+    throw new ConvexError({
+      code: "FRESH_SESSION_REQUIRED",
+      message: "Sign in again before deleting an organization.",
+    });
+  }
+
+  return { auth, headers, user };
+}
 
 const memberPreviewValidator = v.object({
   id: v.string(),
@@ -90,5 +121,33 @@ export const listMyInvitations = query({
       expiresAt: toTimestamp(invitation.expiresAt),
       createdAt: toTimestamp(invitation.createdAt),
     }));
+  },
+});
+
+export const deleteOwnedOrganization = mutation({
+  args: { organizationId: v.string() },
+  returns: v.object({ id: v.string() }),
+  handler: async (ctx, args) => {
+    const { auth, headers, user } = await requireFreshUser(ctx);
+    const membership = await auth.api.getActiveMemberRole({
+      headers,
+      query: { organizationId: args.organizationId },
+    });
+    if (!membership.role.split(",").includes("owner")) {
+      throw new ConvexError({
+        code: "FORBIDDEN",
+        message: "Only an organization owner can delete this organization.",
+      });
+    }
+
+    const organization = await ctx.runMutation(components.betterAuth.admin.deleteOrganization, {
+      organizationId: args.organizationId,
+    });
+    await writeAuditLog(ctx, {
+      action: "organization.delete",
+      actorUserId: String(user._id),
+      targetId: organization.id,
+    });
+    return organization;
   },
 });
