@@ -1,26 +1,26 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Dialog as DialogPrimitive } from "@base-ui/react/dialog"
-import { XIcon } from "lucide-react"
+import * as React from "react";
+import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
+import { XIcon } from "lucide-react";
 
-import { Button } from "@better-convex-stack/ui/components/button"
-import { cn } from "@better-convex-stack/ui/lib/utils"
+import { Button } from "@better-convex-stack/ui/components/button";
+import { cn } from "@better-convex-stack/ui/lib/utils";
 
 function Dialog({ ...props }: DialogPrimitive.Root.Props) {
-  return <DialogPrimitive.Root data-slot="dialog" {...props} />
+  return <DialogPrimitive.Root data-slot="dialog" {...props} />;
 }
 
 function DialogTrigger({ ...props }: DialogPrimitive.Trigger.Props) {
-  return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />
+  return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />;
 }
 
 function DialogClose({ ...props }: DialogPrimitive.Close.Props) {
-  return <DialogPrimitive.Close data-slot="dialog-close" {...props} />
+  return <DialogPrimitive.Close data-slot="dialog-close" {...props} />;
 }
 
 function DialogPortal({ ...props }: DialogPrimitive.Portal.Props) {
-  return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />
+  return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />;
 }
 
 function DialogOverlay({ className, ...props }: DialogPrimitive.Backdrop.Props) {
@@ -33,7 +33,7 @@ function DialogOverlay({ className, ...props }: DialogPrimitive.Backdrop.Props) 
       )}
       {...props}
     />
-  )
+  );
 }
 
 function DialogContent({
@@ -71,17 +71,17 @@ function DialogContent({
         ) : null}
       </DialogPrimitive.Popup>
     </DialogPortal>
-  )
+  );
 }
 
 function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="dialog-header"
-      className={cn("flex flex-col gap-1 border-b border-border/70 p-5 pr-14 sm:p-6 sm:pr-16", className)}
+      className={cn("flex flex-col gap-1 p-5 pr-14 sm:p-6 sm:pr-16", className)}
       {...props}
     />
-  )
+  );
 }
 
 function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
@@ -89,12 +89,12 @@ function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="dialog-footer"
       className={cn(
-        "box-border flex shrink-0 flex-col-reverse gap-2 border-t border-border/70 !px-5 !py-5 sm:flex-row sm:items-center sm:justify-end sm:!px-6 sm:!py-6",
+        "box-border flex shrink-0 flex-col-reverse gap-2 !px-5 !py-5 sm:flex-row sm:items-center sm:justify-end sm:!px-6 sm:!py-6",
         className,
       )}
       {...props}
     />
-  )
+  );
 }
 
 function DialogTitle({ className, ...props }: DialogPrimitive.Title.Props) {
@@ -104,7 +104,7 @@ function DialogTitle({ className, ...props }: DialogPrimitive.Title.Props) {
       className={cn("text-base font-medium tracking-[-0.02em] text-foreground", className)}
       {...props}
     />
-  )
+  );
 }
 
 function DialogDescription({ className, ...props }: DialogPrimitive.Description.Props) {
@@ -114,7 +114,7 @@ function DialogDescription({ className, ...props }: DialogPrimitive.Description.
       className={cn("text-xs/relaxed text-muted-foreground", className)}
       {...props}
     />
-  )
+  );
 }
 
 export {
@@ -128,4 +128,4 @@ export {
   DialogOverlay,
   DialogPortal,
   DialogTitle,
-}
+};

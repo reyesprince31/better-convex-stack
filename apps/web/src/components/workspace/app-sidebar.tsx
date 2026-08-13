@@ -65,7 +65,9 @@ export function AppSidebar({
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{sectionLabel}</span>
-                  <span className="truncate text-xs text-muted-foreground">Orbit workspace</span>
+                  <span className="truncate text-xs text-muted-foreground">
+                    Organization workspace
+                  </span>
                 </div>
               </SidebarMenuButton>
             </SidebarMenuItem>

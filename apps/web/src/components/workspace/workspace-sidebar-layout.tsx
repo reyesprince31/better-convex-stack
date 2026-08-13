@@ -17,9 +17,9 @@ export function WorkspaceSidebarLayout({
   children: React.ReactNode;
 }) {
   return (
-    <SidebarProvider className="h-svh max-h-svh min-h-0 overflow-hidden">
+    <SidebarProvider className="h-svh max-h-svh min-h-0 overflow-hidden bg-sidebar">
       <AppSidebar kind={kind} orgSlug={orgSlug} />
-      <SidebarInset className="min-h-0 overflow-hidden">
+      <SidebarInset className="min-h-0 overflow-hidden md:border md:border-border/80">
         <header className="flex h-16 shrink-0 items-center gap-2 border-b border-border/70 bg-background/90 px-4 backdrop-blur-xl sm:px-6">
           <SidebarTrigger className="-ml-1" />
           <Separator
@@ -30,7 +30,7 @@ export function WorkspaceSidebarLayout({
             {kind === "admin" ? "Control room" : "Organization workspace"}
           </p>
         </header>
-        <div className="min-h-0 flex-1 overflow-y-auto bg-muted/30 px-5 py-8 sm:px-8 lg:py-10">
+        <div className="min-h-0 flex-1 overflow-y-auto bg-muted/35 px-5 py-8 sm:px-8 lg:py-10">
           {children}
         </div>
       </SidebarInset>
