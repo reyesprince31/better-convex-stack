@@ -4,14 +4,16 @@ import AccountSettings, { AccountSettingsFallback } from "@/components/account/a
 
 export default function PersonalSettingsPage() {
   return (
-    <div className="w-full space-y-8">
-      <div className="border-b border-border/70 pb-8">
+    <div className="w-full space-y-7">
+      <div className="pb-1">
         <p className="font-mono text-[10px] tracking-[0.18em] text-muted-foreground uppercase">
-          Personal workspace
+          Your account
         </p>
-        <h1 className="mt-3 text-4xl font-medium tracking-[-0.06em]">Settings</h1>
-        <p className="mt-3 text-sm text-muted-foreground">
-          A quiet place for the details that make Orbit yours.
+        <h1 className="mt-3 text-3xl font-semibold tracking-[-0.045em] sm:text-4xl">
+          Account settings
+        </h1>
+        <p className="mt-2 max-w-2xl text-sm/relaxed text-muted-foreground">
+          Manage your identity, sign-in security, and personal notifications.
         </p>
       </div>
       <Suspense fallback={<AccountSettingsFallback />}>
