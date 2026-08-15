@@ -1,0 +1,7 @@
+.agents
+.claude
+.next
+.turbo
+.source
+node_modules
+packages/backend/convex/_generated
