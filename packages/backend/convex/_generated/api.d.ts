@@ -10,8 +10,12 @@
 
 import type * as account from "../account.js";
 import type * as admin from "../admin.js";
+import type * as adminAuth from "../adminAuth.js";
+import type * as announcementRules from "../announcementRules.js";
+import type * as announcements from "../announcements.js";
 import type * as audit from "../audit.js";
 import type * as auth from "../auth.js";
+import type * as entitlements from "../entitlements.js";
 import type * as healthCheck from "../healthCheck.js";
 import type * as http from "../http.js";
 import type * as organizations from "../organizations.js";
@@ -27,8 +31,12 @@ import type {
 declare const fullApi: ApiFromModules<{
   account: typeof account;
   admin: typeof admin;
+  adminAuth: typeof adminAuth;
+  announcementRules: typeof announcementRules;
+  announcements: typeof announcements;
   audit: typeof audit;
   auth: typeof auth;
+  entitlements: typeof entitlements;
   healthCheck: typeof healthCheck;
   http: typeof http;
   organizations: typeof organizations;
