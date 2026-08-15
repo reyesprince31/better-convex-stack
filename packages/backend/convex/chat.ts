@@ -331,20 +331,24 @@ export const saveValidatedAiSettings = internalMutation({
     const keyIdentifier = userId || "default";
     const provider = args.provider || "google";
 
-    const existing = userId
-      ? await ctx.db
-          .query("aiSettings")
-          .withIndex("by_userId", (q) => q.eq("userId", userId))
-          .first()
-      : await ctx.db
-          .query("aiSettings")
-          .withIndex("by_keyIdentifier", (q) => q.eq("keyIdentifier", "default"))
-          .first();
+    let existing = null;
+    if (userId) {
+      existing = await ctx.db
+        .query("aiSettings")
+        .withIndex("by_userId", (q) => q.eq("userId", userId))
+        .first();
+    }
+    if (!existing) {
+      existing = await ctx.db
+        .query("aiSettings")
+        .withIndex("by_keyIdentifier", (q) => q.eq("keyIdentifier", "default"))
+        .first();
+    }
 
     if (existing) {
       if (provider === "openai") {
         await ctx.db.patch("aiSettings", existing._id, {
-          userId,
+          userId: userId || existing.userId,
           provider: "openai",
           openaiApiKey: args.apiKey,
           openaiModel: args.model,
@@ -353,7 +357,7 @@ export const saveValidatedAiSettings = internalMutation({
         });
       } else {
         await ctx.db.patch("aiSettings", existing._id, {
-          userId,
+          userId: userId || existing.userId,
           provider: "google",
           apiKey: args.apiKey,
           model: args.model,
@@ -383,6 +387,9 @@ export const saveValidatedAiSettings = internalMutation({
           apiKey: args.apiKey,
           model: args.model,
           availableModels: args.availableModels,
+          openaiApiKey: "",
+          openaiModel: "gpt-4o-mini",
+          openaiAvailableModels: [],
           updatedAt: Date.now(),
         });
       }
@@ -396,24 +403,22 @@ export const getAiSettings = query({
     const user = await authComponent.safeGetAuthUser(ctx);
     const userId = user ? String(user._id) : undefined;
 
-    let settings = null;
+    let userSettings = null;
     if (userId) {
-      settings = await ctx.db
+      userSettings = await ctx.db
         .query("aiSettings")
         .withIndex("by_userId", (q) => q.eq("userId", userId))
         .first();
     }
+    const defaultSettings = await ctx.db
+      .query("aiSettings")
+      .withIndex("by_keyIdentifier", (q) => q.eq("keyIdentifier", "default"))
+      .first();
 
-    if (!settings) {
-      settings = await ctx.db
-        .query("aiSettings")
-        .withIndex("by_keyIdentifier", (q) => q.eq("keyIdentifier", "default"))
-        .first();
-    }
-
+    const settings = userSettings || defaultSettings;
     const provider: "google" | "openai" = settings?.provider || "google";
 
-    const googleKey = settings?.apiKey || "";
+    const googleKey = userSettings?.apiKey || defaultSettings?.apiKey || "";
     const googleMaskedKey =
       googleKey.length > 10
         ? `${googleKey.slice(0, 6)}...${googleKey.slice(-4)}`
@@ -421,7 +426,7 @@ export const getAiSettings = query({
           ? "******"
           : "";
 
-    const openaiKey = settings?.openaiApiKey || "";
+    const openaiKey = userSettings?.openaiApiKey || defaultSettings?.openaiApiKey || "";
     const openaiMaskedKey =
       openaiKey.length > 10
         ? `${openaiKey.slice(0, 6)}...${openaiKey.slice(-4)}`
@@ -435,13 +440,13 @@ export const getAiSettings = query({
     const isConfigured = provider === "openai" ? isOpenaiConfigured : isGoogleConfigured;
     const activeModel =
       provider === "openai"
-        ? settings?.openaiModel || "gpt-4o-mini"
-        : settings?.model || "gemini-2.5-flash";
+        ? userSettings?.openaiModel || defaultSettings?.openaiModel || "gpt-4o-mini"
+        : userSettings?.model || defaultSettings?.model || "gemini-2.5-flash";
 
     const activeAvailableModels =
       provider === "openai"
-        ? settings?.openaiAvailableModels || []
-        : settings?.availableModels || [];
+        ? userSettings?.openaiAvailableModels || defaultSettings?.openaiAvailableModels || []
+        : userSettings?.availableModels || defaultSettings?.availableModels || [];
 
     return {
       provider,
@@ -451,14 +456,15 @@ export const getAiSettings = query({
       google: {
         isConfigured: isGoogleConfigured,
         maskedKey: googleMaskedKey,
-        model: settings?.model || "gemini-2.5-flash",
-        availableModels: settings?.availableModels || [],
+        model: userSettings?.model || defaultSettings?.model || "gemini-2.5-flash",
+        availableModels: userSettings?.availableModels || defaultSettings?.availableModels || [],
       },
       openai: {
         isConfigured: isOpenaiConfigured,
         maskedKey: openaiMaskedKey,
-        model: settings?.openaiModel || "gpt-4o-mini",
-        availableModels: settings?.openaiAvailableModels || [],
+        model: userSettings?.openaiModel || defaultSettings?.openaiModel || "gpt-4o-mini",
+        availableModels:
+          userSettings?.openaiAvailableModels || defaultSettings?.openaiAvailableModels || [],
       },
     };
   },
@@ -575,28 +581,33 @@ export const getStoredApiKey = internalQuery({
     userId: v.optional(v.string()),
   },
   handler: async (ctx, args): Promise<StoredAiConfigResult> => {
-    let settings = null;
+    let userSettings = null;
     if (args.userId) {
-      settings = await ctx.db
+      userSettings = await ctx.db
         .query("aiSettings")
         .withIndex("by_userId", (q) => q.eq("userId", args.userId!))
         .first();
     }
-    if (!settings) {
-      settings = await ctx.db
-        .query("aiSettings")
-        .withIndex("by_keyIdentifier", (q) => q.eq("keyIdentifier", "default"))
-        .first();
-    }
+    const defaultSettings = await ctx.db
+      .query("aiSettings")
+      .withIndex("by_keyIdentifier", (q) => q.eq("keyIdentifier", "default"))
+      .first();
 
-    if (!settings) return null;
+    const activeSettings = userSettings || defaultSettings;
+    if (!activeSettings && !userSettings && !defaultSettings) return null;
+
+    const provider: "google" | "openai" = activeSettings?.provider || "google";
+    const googleApiKey = userSettings?.apiKey || defaultSettings?.apiKey || "";
+    const googleModel = userSettings?.model || defaultSettings?.model || "gemini-2.5-flash";
+    const openaiApiKey = userSettings?.openaiApiKey || defaultSettings?.openaiApiKey || "";
+    const openaiModel = userSettings?.openaiModel || defaultSettings?.openaiModel || "gpt-4o-mini";
 
     return {
-      provider: settings.provider || "google",
-      googleApiKey: settings.apiKey,
-      googleModel: settings.model || "gemini-2.5-flash",
-      openaiApiKey: settings.openaiApiKey,
-      openaiModel: settings.openaiModel || "gpt-4o-mini",
+      provider,
+      googleApiKey,
+      googleModel,
+      openaiApiKey,
+      openaiModel,
     };
   },
 });
