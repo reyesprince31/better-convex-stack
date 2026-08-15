@@ -103,17 +103,7 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
     baseURL: siteUrl,
     trustedOrigins: [siteUrl],
     rateLimit: {
-      enabled: true,
-      storage: "database",
-      window: 60,
-      max: 100,
-      customRules: {
-        "/sign-in/email": { window: 60, max: 5 },
-        "/sign-up/email": { window: 60, max: 3 },
-        "/change-password": { window: 60, max: 3 },
-        "/delete-user": { window: 60, max: 3 },
-        "/organization/invite-member": { window: 60, max: 10 },
-      },
+      enabled: false,
     },
     session: {
       expiresIn: 60 * 60 * 24 * 7,
