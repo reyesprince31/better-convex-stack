@@ -1,0 +1,113 @@
+---
+title: Resend Email Integration
+description: Configure transactional emails, verification links, password resets, and webhooks using the official @convex-dev/resend component.
+---
+
+# Resend Email Integration
+
+The Better Convex Stack integrates the official [`@convex-dev/resend`](https://www.npmjs.com/package/@convex-dev/resend) component with [Better Auth](https://better-auth.com) to deliver transactional emails with durable queueing, automatic batching, rate limiting, and webhook event handling.
+
+## Architecture
+
+1. **Transactional Email Engine**: Powered by `@convex-dev/resend` component mounted in `packages/backend/convex/convex.config.ts`.
+2. **Authentication Flow Integrations**:
+   - **Email Verification**: Triggered upon signup and unverified signin attempts via Better Auth (`packages/backend/convex/auth.ts`).
+   - **Password Reset**: Triggered via `auth.api.requestPasswordReset` or client `authClient.requestPasswordReset`.
+   - **Organization Invitations**: Triggered when inviting team members to an organization.
+3. **Resend Webhooks**: Registered at `https://<deployment-name>.convex.site/resend-webhook` in `packages/backend/convex/http.ts` and processed by the component.
+4. **Data Retention Crons**: Scheduled in `packages/backend/convex/crons.ts` to automatically purge finalized email records after 7 days.
+
+---
+
+## Configuration
+
+### Environment Variables
+
+Set the following environment variables in your Convex deployment:
+
+| Variable                | Description                                                     | Example / Default                                                    |
+| ----------------------- | --------------------------------------------------------------- | -------------------------------------------------------------------- |
+| `RESEND_API_KEY`        | Your Resend API key (starts with `re_`)                         | `re_123456789...`                                                    |
+| `RESEND_WEBHOOK_SECRET` | Secret from the Resend webhook dashboard (starts with `whsec_`) | `whsec_123456789...`                                                 |
+| `EMAIL_FROM`            | Sender display name and email address                           | `Acme <onboarding@resend.dev>` or `support@yourdomain.com`           |
+| `SITE_URL`              | Application root URL for verification and invite links          | `http://localhost:3001` (dev) or `https://app.yourdomain.com` (prod) |
+
+To set them via the Convex CLI:
+
+```bash
+npx convex env set RESEND_API_KEY re_xxxxxxxxxxxxxxxxxxxxxxxxx
+npx convex env set RESEND_WEBHOOK_SECRET whsec_xxxxxxxxxxxxxxxxxxxxxxxxx
+npx convex env set EMAIL_FROM "YourApp <noreply@yourdomain.com>"
+```
+
+---
+
+## Setting Up Webhooks
+
+To receive delivery status updates, open/click events, and bounce notifications:
+
+1. Deploy your Convex backend.
+2. In the [Resend Dashboard -> Webhooks](https://resend.com/webhooks), create a new webhook pointing to:
+   ```
+   https://<your-deployment-name>.convex.site/resend-webhook
+   ```
+3. Enable all `email.*` event types (`email.delivered`, `email.bounced`, `email.complained`, `email.opened`, `email.clicked`).
+4. Copy the webhook signing secret and set it in your Convex deployment as `RESEND_WEBHOOK_SECRET`.
+
+---
+
+## Email Templates
+
+Responsive, mobile-friendly HTML & plaintext email templates are defined in `packages/backend/convex/resend/templates.ts`:
+
+- `getVerificationEmailTemplate(props)`: Sent when a user signs up.
+- `getPasswordResetEmailTemplate(props)`: Sent when requesting a password reset.
+- `getInvitationEmailTemplate(props)`: Sent when invited to join an organization.
+
+---
+
+## Sending Emails Programmatically
+
+You can also send custom transactional emails from any Convex mutation or action:
+
+```ts
+import { resend, getEmailFrom } from "./resend";
+import { mutation } from "./_generated/server";
+import { v } from "convex/values";
+
+export const sendWelcomeEmail = mutation({
+  args: { to: v.string(), name: v.string() },
+  returns: v.string(),
+  handler: async (ctx, args) => {
+    const emailId = await resend.sendEmail(ctx, {
+      from: getEmailFrom(),
+      to: args.to,
+      subject: "Welcome to our platform!",
+      html: `<p>Hi ${args.name}, welcome aboard!</p>`,
+      text: `Hi ${args.name}, welcome aboard!`,
+    });
+    return emailId;
+  },
+});
+```
+
+---
+
+## Checking Email Delivery Status
+
+Query the status of any sent email by its `EmailId`:
+
+```ts
+import { useQuery } from "convex/react";
+import { api } from "../convex/_generated/api";
+
+function EmailTracker({ emailId }: { emailId: string }) {
+  const emailStatus = useQuery(api.resend.index.getEmailStatus, {
+    emailId: emailId as any,
+  });
+
+  if (!emailStatus) return <span>Loading status...</span>;
+
+  return <div>Status: {emailStatus.status} (Delivered: {String(!emailStatus.bounced)})</div>;
+}
+```
