@@ -15,13 +15,13 @@
  * server-side scripts (live.mjs, live-server.mjs) that need the structured
  * shape rather than the markdown block.
  */
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-const PRODUCT_NAMES = ['PRODUCT.md', 'Product.md', 'product.md'];
-const DESIGN_NAMES = ['DESIGN.md', 'Design.md', 'design.md'];
-const FALLBACK_DIRS = ['.agents/context', 'docs'];
+const PRODUCT_NAMES = ["PRODUCT.md", "Product.md", "product.md"];
+const DESIGN_NAMES = ["DESIGN.md", "Design.md", "design.md"];
+const FALLBACK_DIRS = [".agents/context", "docs"];
 
 export function resolveContextDir(cwd = process.cwd()) {
   if (firstExisting(cwd, [...PRODUCT_NAMES, ...DESIGN_NAMES])) {
@@ -68,7 +68,7 @@ function firstExisting(dir, names) {
 
 function safeRead(p) {
   try {
-    return fs.readFileSync(p, 'utf-8');
+    return fs.readFileSync(p, "utf-8");
   } catch {
     return null;
   }
@@ -81,14 +81,14 @@ function safeRead(p) {
  */
 export function extractRegister(product) {
   if (!product) return null;
-  const lines = product.split('\n');
+  const lines = product.split("\n");
   for (let i = 0; i < lines.length; i++) {
     if (/^##\s+Register\b/i.test(lines[i].trim())) {
       for (let j = i + 1; j < lines.length; j++) {
         const next = lines[j].trim();
         if (!next) continue;
         const word = next.toLowerCase();
-        if (word === 'brand' || word === 'product') return word;
+        if (word === "brand" || word === "product") return word;
         return null;
       }
     }
@@ -103,11 +103,11 @@ async function cli() {
     // Direct stdout message instead of relying on empty output as a signal
     // — cheap models miss the empty case more often than the explicit one.
     const parts = [
-      'NO_PRODUCT_MD: This project has no PRODUCT.md yet. ' +
-      'Stop the current task, load reference/init.md, and follow its ' +
-      'instructions to write PRODUCT.md before resuming.',
+      "NO_PRODUCT_MD: This project has no PRODUCT.md yet. " +
+        "Stop the current task, load reference/init.md, and follow its " +
+        "instructions to write PRODUCT.md before resuming.",
     ];
-    process.stdout.write(parts.join('\n\n---\n\n') + '\n');
+    process.stdout.write(parts.join("\n\n---\n\n") + "\n");
     process.exit(0);
   }
   const parts = [`# PRODUCT.md\n\n${ctx.product.trim()}`];
@@ -119,7 +119,7 @@ async function cli() {
     ? `NEXT STEP: This project's register is \`${register}\`. You MUST now read \`reference/${register}.md\` before producing any design output.`
     : `NEXT STEP: You MUST now read the matching register reference (\`reference/brand.md\` or \`reference/product.md\`) before producing any design output. Pick based on PRODUCT.md above.`;
   parts.push(next);
-  process.stdout.write(parts.join('\n\n---\n\n') + '\n');
+  process.stdout.write(parts.join("\n\n---\n\n") + "\n");
 }
 
 // Run cli() only when this module is the entry point. Compare realpaths
