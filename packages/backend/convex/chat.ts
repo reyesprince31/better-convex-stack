@@ -81,24 +81,25 @@ export const validateAndSaveApiKey = action({
         };
 
         const rawModels = data.data || [];
-        const allowedExact = [
-          "gpt-5",
+        const efficientPrefixes = [
+          "gpt-5.6-luna",
+          "gpt-5.6-terra",
+          "gpt-5.6-sol",
+          "gpt-5.4-mini",
           "gpt-5-mini",
-          "gpt-5-preview",
-          "gpt-4.5-preview",
-          "gpt-4o",
           "gpt-4o-mini",
           "o3-mini",
+          "o1-mini",
+          "gpt-5.6",
+          "gpt-5.4",
+          "gpt-4o",
           "o3",
           "o1",
-          "o1-mini",
-          "o1-preview",
-          "chatgpt-4o-latest",
-          "gpt-4-turbo",
         ];
 
         let compatibleModels = rawModels
           .filter((m) => {
+            // Exclude expensive or non-chat models
             if (
               m.id.startsWith("ft:") ||
               m.id.includes("realtime") ||
@@ -111,32 +112,24 @@ export const validateAndSaveApiKey = action({
               m.id.includes("babbage") ||
               m.id.includes("davinci") ||
               m.id.includes("instruct") ||
-              m.id.includes("search") ||
-              m.id.includes("similarity") ||
               m.id.includes("moderation") ||
-              m.id.includes("vision-preview")
+              m.id.includes("vision-preview") ||
+              m.id.includes("4.5") || // Exclude heavy 4.5
+              m.id.includes("turbo") // Exclude older expensive turbo
             ) {
               return false;
             }
-            return (
-              allowedExact.includes(m.id) ||
-              m.id.startsWith("gpt-5") ||
-              m.id.startsWith("gpt-4o") ||
-              m.id.startsWith("gpt-4.5") ||
-              m.id.startsWith("o1") ||
-              m.id.startsWith("o3") ||
-              m.id.startsWith("chatgpt")
-            );
+            return efficientPrefixes.some((prefix) => m.id.startsWith(prefix));
           })
           .map((m) => {
-            let desc = "OpenAI intelligence model";
-            if (m.id.includes("5")) desc = "Next-gen frontier intelligence";
-            else if (m.id === "gpt-4o-mini") desc = "Fast & lightweight";
-            else if (m.id === "gpt-4o") desc = "Flagship multimodal";
-            else if (m.id === "o3-mini" || m.id === "o3") desc = "High-speed reasoning";
-            else if (m.id === "o1") desc = "Advanced reasoning";
-            else if (m.id === "o1-mini") desc = "Fast reasoning";
-            else if (m.id.includes("4.5")) desc = "Frontier intelligence";
+            let desc = "Cost-effective OpenAI model";
+            if (m.id.includes("luna")) desc = "Ultra-efficient, cost-optimized";
+            else if (m.id.includes("terra")) desc = "Balanced high-efficiency intelligence";
+            else if (m.id.includes("sol")) desc = "Flagship reasoning & agentic execution";
+            else if (m.id === "gpt-4o-mini" || m.id.includes("mini")) desc = "Fast & lightweight";
+            else if (m.id === "gpt-4o") desc = "High capability workhorse";
+            else if (m.id.startsWith("o3")) desc = "High-speed reasoning";
+            else if (m.id.startsWith("o1")) desc = "Advanced reasoning";
             return {
               id: m.id,
               displayName: m.id,
@@ -145,16 +138,16 @@ export const validateAndSaveApiKey = action({
           })
           .sort((a, b) => {
             const priority: Record<string, number> = {
-              "gpt-4o-mini": 1,
-              "gpt-4o": 2,
-              "o3-mini": 3,
-              "o1": 4,
-              "o1-mini": 5,
-              "gpt-5": 6,
-              "gpt-5-preview": 7,
-              "gpt-4.5-preview": 8,
-              "chatgpt-4o-latest": 9,
-              "gpt-4-turbo": 10,
+              "gpt-5.6-luna": 1,
+              "gpt-5.6-terra": 2,
+              "gpt-5.6-sol": 3,
+              "gpt-5.4-mini": 4,
+              "gpt-4o-mini": 5,
+              "o3-mini": 6,
+              "o1-mini": 7,
+              "gpt-4o": 8,
+              o1: 9,
+              o3: 10,
             };
             const pA = priority[a.id] ?? 99;
             const pB = priority[b.id] ?? 99;
@@ -164,16 +157,37 @@ export const validateAndSaveApiKey = action({
 
         if (compatibleModels.length === 0) {
           compatibleModels = [
-            { id: "gpt-4o-mini", displayName: "gpt-4o-mini", description: "Fast & lightweight" },
-            { id: "gpt-4o", displayName: "gpt-4o", description: "Flagship multimodal" },
-            { id: "o3-mini", displayName: "o3-mini", description: "High-speed reasoning" },
-            { id: "o1", displayName: "o1", description: "Advanced reasoning" },
+            {
+              id: "gpt-5.6-luna",
+              displayName: "gpt-5.6-luna",
+              description: "Ultra-efficient, cost-optimized",
+            },
+            {
+              id: "gpt-5.6-terra",
+              displayName: "gpt-5.6-terra",
+              description: "Balanced high-efficiency intelligence",
+            },
+            {
+              id: "gpt-5.6-sol",
+              displayName: "gpt-5.6-sol",
+              description: "Flagship reasoning & execution",
+            },
+            {
+              id: "gpt-4o-mini",
+              displayName: "gpt-4o-mini",
+              description: "Fast & lightweight",
+            },
+            {
+              id: "o3-mini",
+              displayName: "o3-mini",
+              description: "High-speed reasoning",
+            },
           ];
         }
 
         const defaultModel =
+          compatibleModels.find((m) => m.id === "gpt-5.6-luna")?.id ||
           compatibleModels.find((m) => m.id === "gpt-4o-mini")?.id ||
-          compatibleModels.find((m) => m.id.startsWith("gpt-4o"))?.id ||
           compatibleModels[0]!.id;
 
         await ctx.runMutation(internal.chat.saveValidatedAiSettings, {
@@ -223,14 +237,42 @@ export const validateAndSaveApiKey = action({
 
       const rawModels = data.models || [];
       const compatibleModels = rawModels
-        .filter((m) => m.supportedGenerationMethods?.includes("generateContent"))
+        .filter((m) => {
+          if (!m.supportedGenerationMethods?.includes("generateContent")) return false;
+          const id = m.name.replace(/^models\//, "").toLowerCase();
+          // Filter to efficient models: Flash, Flash-Lite, and Gemini 3.x
+          return (
+            id.includes("flash") ||
+            id.includes("gemini-3") ||
+            id.includes("gemini-2.5") ||
+            id.includes("lite")
+          );
+        })
         .map((m) => {
           const id = m.name.replace(/^models\//, "");
           return {
             id,
             displayName: m.displayName || id,
-            description: m.description,
+            description: m.description || "Cost-effective Google Gemini model",
           };
+        })
+        .sort((a, b) => {
+          // Prioritize 3.5 Flash-Lite, 3.7 Flash, 3.1 Flash-Lite, 2.5 Flash
+          const getPriority = (id: string) => {
+            if (id.includes("3.5-flash-lite")) return 1;
+            if (id.includes("3.7-flash")) return 2;
+            if (id.includes("3.5-flash")) return 3;
+            if (id.includes("3.1-flash-lite")) return 4;
+            if (id.includes("2.5-flash-lite")) return 5;
+            if (id.includes("2.5-flash")) return 6;
+            if (id.includes("flash-lite")) return 7;
+            if (id.includes("flash")) return 8;
+            return 20;
+          };
+          const pA = getPriority(a.id);
+          const pB = getPriority(b.id);
+          if (pA !== pB) return pA - pB;
+          return a.id.localeCompare(b.id);
         });
 
       if (compatibleModels.length === 0) {
