@@ -15,6 +15,8 @@ export const auditActionValidator = v.union(
   v.literal("member.delete"),
   v.literal("user.tier.update"),
   v.literal("user.delete"),
+  v.literal("email.bounced"),
+  v.literal("email.complained"),
 );
 
 export const announcementToneValidator = v.union(
