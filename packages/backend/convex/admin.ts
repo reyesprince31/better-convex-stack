@@ -1,9 +1,13 @@
 import { components } from "./_generated/api";
-import type { MutationCtx, QueryCtx } from "./_generated/server";
 import { mutation, query } from "./_generated/server";
-import { authComponent, createAuth } from "./auth";
+import {
+  boundedAdminLimit,
+  limitAdminOperation,
+  requireAdmin,
+  requireFreshAdmin,
+} from "./adminAuth";
+import { createAuth } from "./auth";
 import { writeAuditLog } from "./audit";
-import { rateLimiter } from "./rateLimits";
 import { ConvexError, v } from "convex/values";
 
 const organizationSummary = v.object({
@@ -23,57 +27,11 @@ const memberSummary = v.object({
   createdAt: v.number(),
 });
 
-type AdminContext = QueryCtx | MutationCtx;
 const organizationRoleValidator = v.union(
   v.literal("owner"),
   v.literal("admin"),
   v.literal("member"),
 );
-const ADMIN_FRESH_AGE_MS = 15 * 60 * 1000;
-
-async function requireAdmin(ctx: AdminContext) {
-  const identity = await ctx.auth.getUserIdentity();
-  if (!identity) {
-    throw new ConvexError({ code: "UNAUTHENTICATED", message: "Authentication required." });
-  }
-
-  const user = await authComponent.safeGetAuthUser(ctx);
-  if (user?.role !== "admin") {
-    throw new ConvexError({ code: "FORBIDDEN", message: "Admin access required." });
-  }
-
-  return user;
-}
-
-async function requireFreshAdmin(ctx: MutationCtx) {
-  const admin = await requireAdmin(ctx);
-  const { auth, headers } = await authComponent.getAuth(createAuth, ctx);
-  const session = await auth.api.getSession({
-    headers,
-    query: { disableCookieCache: true, disableRefresh: true },
-  });
-  const createdAt = session ? new Date(session.session.createdAt).getTime() : Number.NaN;
-
-  if (!session || !Number.isFinite(createdAt) || Date.now() - createdAt >= ADMIN_FRESH_AGE_MS) {
-    throw new ConvexError({
-      code: "FRESH_SESSION_REQUIRED",
-      message: "Sign in again before performing this sensitive admin operation.",
-    });
-  }
-
-  return { admin, auth, headers };
-}
-
-async function limitAdminOperation(ctx: MutationCtx, actorUserId: string) {
-  await rateLimiter.limit(ctx, "adminSensitiveOperation", {
-    key: actorUserId,
-    throws: true,
-  });
-}
-
-function boundedLimit(limit: number | undefined) {
-  return Math.min(Math.max(limit ?? 100, 1), 100);
-}
 
 export const listOrganizations = query({
   args: { limit: v.optional(v.number()) },
@@ -81,7 +39,7 @@ export const listOrganizations = query({
   handler: async (ctx, args) => {
     await requireAdmin(ctx);
     return await ctx.runQuery(components.betterAuth.admin.listOrganizations, {
-      limit: boundedLimit(args.limit),
+      limit: boundedAdminLimit(args.limit),
     });
   },
 });
@@ -95,7 +53,7 @@ export const listMembers = query({
   handler: async (ctx, args) => {
     await requireAdmin(ctx);
     return await ctx.runQuery(components.betterAuth.admin.listMembers, {
-      limit: boundedLimit(args.limit),
+      limit: boundedAdminLimit(args.limit),
       organizationId: args.organizationId,
     });
   },
@@ -264,6 +222,13 @@ export const removeUser = mutation({
       headers,
     });
     await ctx.runMutation(components.betterAuth.admin.deleteUserMemberships, args);
+    const entitlement = await ctx.db
+      .query("userEntitlements")
+      .withIndex("by_userId", (q) => q.eq("userId", args.userId))
+      .unique();
+    if (entitlement) {
+      await ctx.db.delete("userEntitlements", entitlement._id);
+    }
     await writeAuditLog(ctx, {
       action: "user.delete",
       actorUserId: String(admin._id),
