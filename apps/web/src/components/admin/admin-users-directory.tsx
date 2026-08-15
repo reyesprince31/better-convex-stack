@@ -110,6 +110,9 @@ export function AdminUsersDirectory({
                   <span className="inline-flex items-center gap-1.5 font-mono text-[10px] tracking-[0.12em] text-muted-foreground uppercase">
                     <Shield className="size-3" /> {user.role ?? "user"}
                   </span>
+                  <span className="font-mono text-[10px] tracking-[0.12em] text-muted-foreground uppercase">
+                    {user.tier ?? "free"}
+                  </span>
                   {user.banned ? (
                     <span className="font-mono text-[10px] tracking-[0.12em] text-destructive uppercase">
                       Banned

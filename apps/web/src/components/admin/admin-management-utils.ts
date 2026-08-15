@@ -3,11 +3,13 @@ export type AdminUser = {
   name: string;
   email: string;
   role?: string | null;
+  tier?: SubscriptionTier;
   banned?: boolean | null;
   createdAt: Date | number | string;
 };
 
 export type UserRole = "admin" | "user";
+export type SubscriptionTier = "enterprise" | "free" | "pro";
 
 export type OrganizationSummary = {
   id: string;
@@ -45,6 +47,7 @@ export type UserFormValues = {
   email: string;
   password: string;
   role: UserRole;
+  tier: SubscriptionTier;
 };
 
 export type OrganizationFormValues = {

@@ -4,7 +4,7 @@ import { Button } from "@better-convex-stack/ui/components/button";
 import { api } from "@better-convex-stack/backend/convex/_generated/api";
 import { UserPlus } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { toast } from "sonner";
 
 import { AdminUserDialog } from "./admin-user-dialog";
@@ -19,13 +19,22 @@ import { authClient } from "@/lib/auth-client";
 
 export function AdminUsersManagement() {
   const removeUser = useMutation(api.admin.removeUser);
+  const setUserTier = useMutation(api.entitlements.setTier);
   const [users, setUsers] = useState<AdminUser[]>([]);
+  const entitlements = useQuery(api.entitlements.listForUsers, {
+    userIds: users.map((user) => user.id),
+  }) as { userId: string; tier: "enterprise" | "free" | "pro" }[] | undefined;
   const [total, setTotal] = useState(0);
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [dialog, setDialog] = useState<UserDialogState | null>(null);
   const [pendingUserId, setPendingUserId] = useState<string | null>(null);
+  const tierByUserId = new Map(entitlements?.map((item) => [item.userId, item.tier]));
+  const usersWithTiers = users.map((user) => ({
+    ...user,
+    tier: tierByUserId.get(user.id) ?? "free",
+  }));
 
   const loadUsers = useCallback(async () => {
     setIsLoading(true);
@@ -75,7 +84,7 @@ export function AdminUsersManagement() {
           throw new Error(getErrorMessage(updateResult.error, "The member could not be updated."));
         }
 
-        const currentUser = users.find((user) => user.id === editingUserId);
+        const currentUser = usersWithTiers.find((user) => user.id === editingUserId);
         if (currentUser?.role !== values.role) {
           const roleResult = await authClient.admin.setRole({
             userId: editingUserId,
@@ -87,6 +96,9 @@ export function AdminUsersManagement() {
             );
           }
         }
+        if (currentUser?.tier !== values.tier) {
+          await setUserTier({ userId: editingUserId, tier: values.tier });
+        }
         toast.success("Member updated");
       } else {
         const createResult = await authClient.admin.createUser({
@@ -97,6 +109,10 @@ export function AdminUsersManagement() {
         });
         if (createResult.error) {
           throw new Error(getErrorMessage(createResult.error, "The member could not be created."));
+        }
+        const newUserId = createResult.data?.user.id;
+        if (newUserId && values.tier !== "free") {
+          await setUserTier({ userId: newUserId, tier: values.tier });
         }
         toast.success("Member created");
       }
@@ -126,7 +142,9 @@ export function AdminUsersManagement() {
   }
 
   const activeUser =
-    dialog && "userId" in dialog ? users.find((user) => user.id === dialog.userId) : undefined;
+    dialog && "userId" in dialog
+      ? usersWithTiers.find((user) => user.id === dialog.userId)
+      : undefined;
 
   return (
     <div className="space-y-8">
@@ -140,17 +158,21 @@ export function AdminUsersManagement() {
             Create members here before adding them to an organization.
           </p>
         </div>
-        <Button type="button" className="w-full sm:w-auto" onClick={() => setDialog({ mode: "create" })}>
+        <Button
+          type="button"
+          className="w-full sm:w-auto"
+          onClick={() => setDialog({ mode: "create" })}
+        >
           <UserPlus />
           Add member
         </Button>
       </section>
 
       <AdminUsersDirectory
-        users={users}
+        users={usersWithTiers}
         total={total}
         search={search}
-        isLoading={isLoading}
+        isLoading={isLoading || entitlements === undefined}
         loadError={loadError}
         pendingUserId={pendingUserId}
         onSearchChange={setSearch}
