@@ -17,7 +17,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 import type { UIMessageItem } from "./agent-types";
-import { Reasoning } from "./reasoning";
+import { AutoChainOfThought } from "./chain-of-thought";
 
 type ChatMessageListProps = {
   messages: UIMessageItem[];
@@ -246,7 +246,10 @@ export function ChatMessageList({
 
                 <div className="text-foreground">
                   {reasoningText && (
-                    <Reasoning durationMs={msg.durationMs}>{reasoningText}</Reasoning>
+                    <AutoChainOfThought
+                      durationMs={msg.durationMs}
+                      reasoning={reasoningText}
+                    />
                   )}
 
                   {!msg.text || !msg.text.trim() ? (
