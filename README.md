@@ -1,95 +1,132 @@
-# better-convex-stack
+<div align="center">
 
-This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines Next.js, Convex, and more.
+# ⚡ Better Convex Stack
 
-## Features
+**The modern, production-ready SaaS template built with Next.js 16, Convex, Better Auth, and Cloudflare R2.**
 
-- **TypeScript** - For type safety and improved developer experience
-- **Next.js** - Full-stack React framework
-- **TailwindCSS** - Utility-first CSS for rapid UI development
-- **Shared UI package** - shadcn/ui primitives live in `packages/ui`
-- **Convex** - Reactive backend-as-a-service platform
-- **Authentication** - Better-Auth
-- **Oxlint** - Oxlint + Oxfmt (linting & formatting)
-- **PWA** - Progressive Web App support
-- **Turborepo** - Optimized monorepo build system
+[![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat&logo=next.js)](https://nextjs.org/)
+[![Convex](https://img.shields.io/badge/Convex-1.44-ff4f00?style=flat&logo=convex)](https://convex.dev/)
+[![Better Auth](https://img.shields.io/badge/Better_Auth-Latest-blue?style=flat)](https://better-auth.com/)
+[![Cloudflare R2](https://img.shields.io/badge/Cloudflare_R2-Storage-F38020?style=flat&logo=cloudflare)](https://developers.cloudflare.com/r2/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=flat&logo=typescript)](https://www.typescriptlang.org/)
+[![Oxlint](https://img.shields.io/badge/Linted_with-Oxlint-cyan?style=flat)](https://oxc.rs/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## Getting Started
+</div>
 
-First, install the dependencies:
+---
+
+## 🌟 Overview
+
+**Better Convex Stack** is a full-stack, open-source boilerplate engineered for developers who want to launch production-grade, real-time web applications and SaaS platforms without rebuilding authentication, multi-tenancy, storage, or admin control rooms from scratch.
+
+---
+
+## 🚀 Key Features
+
+- **⚡ Next.js 16 (App Router & Turbopack)**: Blazing-fast page loads with Partial Prerendering (PPR), React Server Components, and optimized client islands.
+- **🔥 Convex Reactive Backend**: Real-time subscriptions, end-to-end type safety, server functions, scheduled crons, and modular components.
+- **🔐 Better Auth + Convex Adapter**: Complete authentication suite with email/password, social logins, session management, and organization multi-tenancy.
+- **📦 Cloudflare R2 Storage (`@convex-dev/r2`)**: Direct-to-storage presigned uploads with zero egress fees, reactive metadata syncing, and automatic orphan file cleanup.
+- **🏢 Multi-Tenant Workspaces & RBAC**: Organization switching, team invitations, member management, and granular permission roles.
+- **👑 Admin Console & User Entitlements**: Built-in control room for managing users, updating subscription tiers (`free`, `pro`, `enterprise`), publishing announcement banners, and viewing system health.
+- **🎨 Shared UI Design System (`@better-convex-stack/ui`)**: Modular Turborepo UI workspace powered by shadcn/ui and Tailwind CSS with crisp Orbit design language and light/dark theme support.
+- **🏎️ Ultra-Fast Tooling**: Turborepo task pipeline with [Oxlint](https://oxc.rs/) and [Oxfmt](https://oxc.rs/) for sub-second type checking, linting, and formatting.
+
+---
+
+## 🏗️ Monorepo Structure
+
+```
+better-convex-stack/
+├── apps/
+│   ├── web/                     # Next.js 16 web application
+│   └── fumadocs/                # Documentation & knowledge base
+├── packages/
+│   ├── backend/                 # Convex backend schema, mutations, queries & R2
+│   ├── ui/                      # Shared shadcn/ui components, dialogs, avatars
+│   ├── env/                     # Shared type-safe environment schema
+│   └── config/                  # Shared ESLint/Oxlint, Prettier, TypeScript configs
+└── docs/                        # Architecture guides, deployment, and security standards
+```
+
+---
+
+## ⚡ Quick Start
+
+### 1. Prerequisites
+
+- **Node.js**: `v20.x` or later
+- **pnpm**: `v10.x` or later (`npm install -g pnpm`)
+
+### 2. Clone & Install
 
 ```bash
+git clone https://github.com/reyesprince31/better-convex-stack.git
+cd better-convex-stack
 pnpm install
 ```
 
-## Convex Setup
-
-This project uses Convex as a backend. You'll need to set up Convex before running the app:
+### 3. Initialize Convex Backend
 
 ```bash
 pnpm run dev:setup
 ```
 
-Follow the prompts to create a new Convex project and connect it to your application.
+This command initializes your Convex development deployment and generates backend types automatically.
 
-Copy environment variables from `packages/backend/.env.local` to `apps/*/.env`.
+### 4. Configure Environment Variables
 
-Then, run the development server:
+Copy `.env.example` in `apps/web`:
+
+```bash
+cp apps/web/.env.example apps/web/.env
+```
+
+_(Optional: Cloudflare R2)_ — To enable cloud file storage, set your R2 credentials in Convex:
+
+```bash
+npx convex env set R2_BUCKET <bucket-name>
+npx convex env set R2_TOKEN <cloudflare-api-token>
+npx convex env set R2_ACCESS_KEY_ID <access-key>
+npx convex env set R2_SECRET_ACCESS_KEY <secret-key>
+npx convex env set R2_ENDPOINT https://<account-id>.r2.cloudflarestorage.com
+```
+
+### 5. Start Developing
 
 ```bash
 pnpm run dev
 ```
 
-Open [http://localhost:3001](http://localhost:3001) in your browser to see the web application.
-Your app will connect to the Convex cloud backend automatically.
+Open [http://localhost:3001](http://localhost:3001) in your browser.
 
-## UI Customization
+---
 
-React web apps in this stack share shadcn/ui primitives through `packages/ui`.
+## 🛠️ Available Scripts
 
-- Change design tokens and global styles in `packages/ui/src/styles/globals.css`
-- Update shared primitives in `packages/ui/src/components/*`
-- Adjust shadcn aliases or style config in `packages/ui/components.json` and `apps/web/components.json`
+| Command                | Description                                           |
+| :--------------------- | :---------------------------------------------------- |
+| `pnpm run dev`         | Starts Next.js and Convex concurrently                |
+| `pnpm run dev:web`     | Runs the Next.js web application only                 |
+| `pnpm run dev:setup`   | Initializes and connects a new Convex backend project |
+| `pnpm run check-types` | Type-checks all monorepo packages across Turbo cache  |
+| `pnpm run check`       | Runs Oxlint and Oxfmt across all files                |
+| `pnpm run build`       | Builds production bundles for all apps                |
 
-### Add more shared components
+---
 
-Run this from the project root to add more primitives to the shared UI package:
+## 🤝 Contributing & Collaborators
 
-```bash
-npx shadcn@latest add accordion dialog popover sheet table -c packages/ui
-```
+We welcome contributions from the community! Check out our [**Contributing Guide (CONTRIBUTING.md)**](CONTRIBUTING.md) for details on:
 
-Import shared components like this:
+- Monorepo development guidelines
+- Stacked PR workflow with `gh stack`
+- React 19 event types & management dialog conventions
+- Convex Auth & security standards
 
-```tsx
-import { Button } from "@better-convex-stack/ui/components/button";
-```
+---
 
-### Add app-specific blocks
+## 📄 License
 
-If you want to add app-specific blocks instead of shared primitives, run the shadcn CLI from `apps/web`.
-
-## Git Hooks and Formatting
-
-- Run checks: `pnpm run check`
-
-## Project Structure
-
-```
-better-convex-stack/
-├── apps/
-│   ├── web/         # Frontend application (Next.js)
-├── packages/
-│   ├── ui/          # Shared shadcn/ui components and styles
-│   ├── backend/     # Convex backend functions and schema
-```
-
-## Available Scripts
-
-- `pnpm run dev`: Start all applications in development mode
-- `pnpm run build`: Build all applications
-- `pnpm run dev:web`: Start only the web application
-- `pnpm run dev:setup`: Setup and configure your Convex project
-- `pnpm run check-types`: Check TypeScript types across all apps
-- `pnpm run check`: Run Oxlint and Oxfmt
-- `cd apps/web && pnpm run generate-pwa-assets`: Generate PWA assets
+Distributed under the **MIT License**. See [LICENSE](LICENSE) for more information.
