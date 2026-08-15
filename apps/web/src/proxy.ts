@@ -2,7 +2,14 @@ import { getSessionCookie } from "better-auth/cookies";
 import { type NextRequest, NextResponse } from "next/server";
 
 const protectedPrefixes = ["/admin", "/home", "/dashboard"];
-const authRoutes = ["/login", "/signup", "/sign-in", "/sign-up"];
+const authRoutes = [
+  "/login",
+  "/signup",
+  "/sign-in",
+  "/sign-up",
+  "/forgot-password",
+  "/reset-password",
+];
 
 function isProtectedPath(pathname: string) {
   return protectedPrefixes.some(
@@ -38,5 +45,7 @@ export const config = {
     "/signup",
     "/sign-in",
     "/sign-up",
+    "/forgot-password",
+    "/reset-password",
   ],
 };
