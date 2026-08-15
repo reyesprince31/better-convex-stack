@@ -13,6 +13,7 @@
     "@better-convex-stack/env": "workspace:*",
     "@better-convex-stack/ui": "workspace:*",
     "@convex-dev/better-auth": "catalog:",
+    "@convex-dev/r2": "^0.10.2",
     "@swc/helpers": "^0.5.23",
     "@tanstack/react-form": "^1.33.2",
     "babel-plugin-react-compiler": "^1.0.0",

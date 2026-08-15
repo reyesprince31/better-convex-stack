@@ -1,6 +1,5 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@better-convex-stack/ui/components/avatar";
 import { Button } from "@better-convex-stack/ui/components/button";
 import {
   Dialog,
@@ -29,6 +28,7 @@ import type * as React from "react";
 
 import { SettingsPanel, SettingsToggle } from "@/components/shared/settings-ui";
 
+import { AvatarUpload } from "./avatar-upload";
 import {
   DELETE_CONFIRMATION,
   notificationPreferences,
@@ -60,31 +60,28 @@ export function ProfileSettingsPanel({
   onSubmit: (event: React.SubmitEvent<HTMLFormElement>) => void;
 }) {
   return (
-    <form onSubmit={onSubmit}>
-      <SettingsPanel
-        title="Profile details"
-        description="Your name and photo are shared across every workspace you join."
-        footer={
-          <Button type="submit" className="h-9 rounded-lg px-4" disabled={isSaving}>
-            {isSaving ? <LoaderCircle className="animate-spin" /> : null}
-            {isSaving ? "Saving..." : "Save changes"}
-          </Button>
-        }
-      >
-        <div className="grid gap-7 lg:grid-cols-[13rem_minmax(0,1fr)]">
-          <div>
-            <p className="text-xs font-medium">Profile photo</p>
-            <div className="mt-3 flex items-center gap-3 lg:block">
-              <Avatar className="size-16 rounded-none lg:size-20">
-                <AvatarImage src={user.image ?? undefined} alt={user.name} />
-                <AvatarFallback className="rounded-none text-base">{initials}</AvatarFallback>
-              </Avatar>
-              <p className="max-w-48 text-[11px]/relaxed text-muted-foreground lg:mt-3">
-                Photo updates are ready for a storage provider when your project needs them.
-              </p>
-            </div>
-          </div>
+    <div className="space-y-5">
+      {/* Profile Picture Card */}
+      <section className="border border-border/80 bg-card p-5 sm:p-6">
+        <AvatarUpload user={user} initials={initials} />
+      </section>
 
+      {/* Personal Information Form Card */}
+      <form onSubmit={onSubmit}>
+        <SettingsPanel
+          title="Personal Information"
+          description="Update your core identity and profile details."
+          footer={
+            <Button
+              type="submit"
+              className="h-9 rounded-none px-4 text-xs font-medium"
+              disabled={isSaving}
+            >
+              {isSaving ? <LoaderCircle className="animate-spin" /> : null}
+              {isSaving ? "Saving..." : "Save changes"}
+            </Button>
+          }
+        >
           <div className="grid gap-5 sm:grid-cols-2">
             <div className="space-y-2 sm:col-span-2">
               <Label htmlFor="account-name">Full name</Label>
@@ -92,7 +89,7 @@ export function ProfileSettingsPanel({
                 id="account-name"
                 value={name}
                 onChange={(event) => onNameChange(event.target.value)}
-                className="h-10 rounded-lg"
+                className="h-10 rounded-none"
                 autoComplete="name"
                 required
               />
@@ -100,27 +97,27 @@ export function ProfileSettingsPanel({
             <div className="space-y-2 sm:col-span-2">
               <div className="flex items-center justify-between gap-3">
                 <Label htmlFor="account-email">Email address</Label>
-                <span className="inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground">
-                  {user.emailVerified ? <Check className="size-3" /> : null}
+                <span className="inline-flex items-center gap-1 font-mono text-[10px] tracking-wide uppercase text-muted-foreground">
+                  {user.emailVerified ? <Check className="size-3 text-emerald-500" /> : null}
                   {user.emailVerified ? "Verified" : "Verification pending"}
                 </span>
               </div>
               <Input
                 id="account-email"
                 value={user.email}
-                className="h-10 rounded-lg"
+                className="h-10 rounded-none bg-muted/40"
                 readOnly
                 disabled
                 aria-describedby="account-email-help"
               />
               <p id="account-email-help" className="text-[11px]/relaxed text-muted-foreground">
-                Email changes stay disabled until the verified change-email flow is connected.
+                Changing your email requires verification through security settings.
               </p>
             </div>
           </div>
-        </div>
-      </SettingsPanel>
-    </form>
+        </SettingsPanel>
+      </form>
+    </div>
   );
 }
 

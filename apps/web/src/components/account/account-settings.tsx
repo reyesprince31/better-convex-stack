@@ -1,10 +1,8 @@
 "use client";
 
 import { api } from "@better-convex-stack/backend/convex/_generated/api";
-import { Avatar, AvatarFallback, AvatarImage } from "@better-convex-stack/ui/components/avatar";
 import { Skeleton } from "@better-convex-stack/ui/components/skeleton";
 import { useMutation, useQuery } from "convex/react";
-import { BadgeCheck, CircleUserRound } from "lucide-react";
 import type { Route } from "next";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -240,34 +238,6 @@ export default function AccountSettings() {
 
   return (
     <div className="space-y-5">
-      <section className="relative overflow-hidden bg-foreground px-5 py-6 text-background sm:px-7 sm:py-7">
-        <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex min-w-0 items-center gap-4">
-            <Avatar className="size-16 rounded-none ring-1 ring-background/25">
-              <AvatarImage src={user.image ?? undefined} alt={displayName} />
-              <AvatarFallback className="rounded-none bg-background/10 text-lg text-background">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <h2 className="truncate text-xl font-semibold tracking-[-0.035em]">
-                  {displayName}
-                </h2>
-                {user.emailVerified ? <BadgeCheck className="size-4 shrink-0" /> : null}
-              </div>
-              <p className="mt-1 truncate text-sm text-background/75">{user.email}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 border border-background/15 bg-background/[0.07] px-4 py-3 sm:max-w-56">
-            <CircleUserRound className="size-4 shrink-0" />
-            <p className="text-xs/relaxed text-background/80">
-              Personal settings apply across every workspace.
-            </p>
-          </div>
-        </div>
-      </section>
-
       <SettingsTabs tabs={tabs} activeTab={activeTab} label="Account settings" />
 
       {activeTab === "profile" ? (

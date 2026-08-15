@@ -1,6 +1,7 @@
 "use client";
 
 import { api } from "@better-convex-stack/backend/convex/_generated/api";
+import { Avatar, AvatarFallback, AvatarImage } from "@better-convex-stack/ui/components/avatar";
 import { Button } from "@better-convex-stack/ui/components/button";
 import { Skeleton } from "@better-convex-stack/ui/components/skeleton";
 import {
@@ -122,9 +123,12 @@ export default function UserMenu({
           />
         }
       >
-        <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-foreground text-[10px] font-medium text-background">
-          {initials}
-        </span>
+        <Avatar shape="circle" className="size-8 shrink-0">
+          <AvatarImage src={user.image ?? undefined} alt={displayName} />
+          <AvatarFallback className="bg-foreground text-[10px] font-medium text-background">
+            {initials}
+          </AvatarFallback>
+        </Avatar>
         {showIdentity ? (
           <span className="grid min-w-0 flex-1 text-left leading-tight">
             <span className="max-w-28 truncate text-xs font-medium">{displayName}</span>
@@ -144,9 +148,19 @@ export default function UserMenu({
         className="w-64"
       >
         <DropdownMenuGroup>
-          <DropdownMenuLabel className="py-3">
-            <p className="font-medium text-foreground">{displayName}</p>
-            <p className="mt-1 truncate text-[11px]">{user?.email ?? "Signed-in account"}</p>
+          <DropdownMenuLabel className="flex items-center gap-3 py-3">
+            <Avatar shape="circle" className="size-9 shrink-0">
+              <AvatarImage src={user.image ?? undefined} alt={displayName} />
+              <AvatarFallback className="bg-foreground text-xs font-medium text-background">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
+            <div className="min-w-0">
+              <p className="truncate text-xs font-semibold text-foreground">{displayName}</p>
+              <p className="truncate text-[11px] text-muted-foreground font-normal">
+                {user?.email ?? "Signed-in account"}
+              </p>
+            </div>
           </DropdownMenuLabel>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
