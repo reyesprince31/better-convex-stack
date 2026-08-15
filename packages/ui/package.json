@@ -30,6 +30,7 @@
   "devDependencies": {
     "@better-convex-stack/config": "workspace:*",
     "@tailwindcss/postcss": "catalog:",
+    "@tailwindcss/typography": "^0.5.20",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "tailwindcss": "catalog:",

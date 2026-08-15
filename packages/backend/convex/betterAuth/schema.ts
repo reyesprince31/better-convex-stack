@@ -10,7 +10,10 @@ const schema = defineSchema({
     key: v.string(),
     count: v.number(),
     lastRequest: v.number(),
-  }).index("key", ["key"]),
+  })
+    .index("key", ["key"])
+    .index("lastRequest", ["lastRequest"])
+    .index("key_lastRequest", ["key", "lastRequest"]),
 });
 
 export default schema;

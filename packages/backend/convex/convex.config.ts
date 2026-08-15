@@ -1,3 +1,4 @@
+import agent from "@convex-dev/agent/convex.config";
 import rateLimiterComponent from "@convex-dev/rate-limiter/convex.config";
 import r2 from "@convex-dev/r2/convex.config";
 import { defineApp } from "convex/server";
@@ -16,5 +17,6 @@ const app = defineApp({
 app.use(betterAuth);
 app.use(rateLimiterComponent);
 app.use(r2);
+app.use(agent);
 
 export default app;

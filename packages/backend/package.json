@@ -10,9 +10,13 @@
     "dev:setup": "convex dev --configure --until-success"
   },
   "dependencies": {
+    "@ai-sdk/google": "^3.0.110",
+    "@ai-sdk/openai": "^4.0.42",
+    "@convex-dev/agent": "^0.6.4",
     "@convex-dev/better-auth": "catalog:",
     "@convex-dev/r2": "^0.10.2",
     "@convex-dev/rate-limiter": "^0.3.2",
+    "ai": "^6.0.256",
     "better-auth": "catalog:",
     "convex": "catalog:",
     "dotenv": "catalog:",
