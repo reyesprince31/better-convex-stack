@@ -10,7 +10,10 @@ export function getSafeRedirect(value: string | null) {
   return value;
 }
 
-export function getAuthRouteHref(route: "/login" | "/signup", redirectTo: string): Route {
+export function getAuthRouteHref(
+  route: "/login" | "/signup" | "/forgot-password" | "/reset-password",
+  redirectTo: string,
+): Route {
   if (redirectTo === DEFAULT_AUTH_REDIRECT) return route as Route;
 
   const params = new URLSearchParams({ redirect: redirectTo });
