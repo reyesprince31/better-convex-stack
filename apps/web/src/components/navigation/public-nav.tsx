@@ -4,8 +4,9 @@ import type { Route } from "next";
 import { ModeToggle } from "@/components/theme/mode-toggle";
 
 const links = [
-  { href: "/blog", label: "Journal" },
-  { href: "/#principles", label: "Principles" },
+  { href: "/home" as Route, label: "AI Agent" },
+  { href: "/blog" as Route, label: "Journal" },
+  { href: "/#principles" as Route, label: "Principles" },
 ] as const;
 
 export function PublicNav() {

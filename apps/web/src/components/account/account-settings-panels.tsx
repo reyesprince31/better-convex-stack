@@ -1,6 +1,8 @@
 "use client";
 
+import { api } from "@better-convex-stack/backend/convex/_generated/api";
 import { Button } from "@better-convex-stack/ui/components/button";
+
 import {
   Dialog,
   DialogClose,
@@ -12,19 +14,28 @@ import {
 } from "@better-convex-stack/ui/components/dialog";
 import { Input } from "@better-convex-stack/ui/components/input";
 import { Label } from "@better-convex-stack/ui/components/label";
+import { useAction, useMutation, useQuery } from "convex/react";
 import {
+  AlertCircle,
   ArchiveRestore,
   Check,
+  CheckCircle2,
   Download,
+  ExternalLink,
   FileArchive,
+  Key,
   KeyRound,
+  Loader2,
   LoaderCircle,
   LogOut,
   Monitor,
   ShieldCheck,
+  Sparkles,
   Trash2,
 } from "lucide-react";
+import { useState } from "react";
 import type * as React from "react";
+import { toast } from "sonner";
 
 import { SettingsPanel, SettingsToggle } from "@/components/shared/settings-ui";
 
@@ -487,5 +498,201 @@ export function DeleteAccountDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+export function AiSettingsPanel() {
+  const aiSettings = useQuery(api.chat.getAiSettings);
+  const validateAndSaveKeyAction = useAction(api.chat.validateAndSaveApiKey);
+  const updateModelMutation = useMutation(api.chat.updateActiveModel);
+
+  const [apiKeyInput, setApiKeyInput] = useState("");
+  const [isValidating, setIsValidating] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
+
+  const handleValidateAndSave = async (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!apiKeyInput.trim()) return;
+
+    setIsValidating(true);
+    setValidationError(null);
+
+    try {
+      const res = await validateAndSaveKeyAction({ apiKey: apiKeyInput.trim() });
+      if (res.success) {
+        setApiKeyInput("");
+        toast.success(`Google Gemini API Key verified! (${res.models.length} models found)`);
+      } else {
+        setValidationError(res.error || "Failed to validate key with Google API.");
+        toast.error(res.error || "Failed to validate key.");
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setValidationError(msg);
+      toast.error(`Validation error: ${msg}`);
+    } finally {
+      setIsValidating(false);
+    }
+  };
+
+  const handleModelChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newModel = e.target.value;
+    try {
+      await updateModelMutation({ model: newModel });
+      toast.success(`Default model updated to ${newModel}`);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      toast.error(`Failed to update model: ${msg}`);
+    }
+  };
+
+  const availableModels = aiSettings?.availableModels || [];
+
+  return (
+    <div className="space-y-6">
+      <SettingsPanel
+        title="Google Gemini (BYOK)"
+        description="Bring your own Google Generative AI key to power your agent workspace. Your key is verified directly against Google's API."
+      >
+        <div className="space-y-5">
+          {/* Status Indicator */}
+          <div className="flex items-center justify-between border border-border/70 bg-muted/20 p-4">
+            <div className="flex items-center gap-3">
+              <div
+                className={`flex size-8 items-center justify-center rounded-full ${
+                  aiSettings?.isConfigured
+                    ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                    : "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                }`}
+              >
+                <Key className="size-4" />
+              </div>
+              <div>
+                <p className="text-xs font-medium">
+                  {aiSettings?.isConfigured
+                    ? `Active Key (${aiSettings.provider === "openai" ? "OpenAI" : "Gemini"}): ${
+                        aiSettings.provider === "openai"
+                          ? aiSettings.openai.maskedKey
+                          : aiSettings.google.maskedKey
+                      }`
+                    : "No API Key Configured"}
+                </p>
+                <p className="text-[11px] text-muted-foreground">
+                  {aiSettings?.isConfigured
+                    ? `${availableModels.length} models unlocked for your account.`
+                    : "Add an API key to enable AI agent conversations and tool executions."}
+                </p>
+              </div>
+            </div>
+            {aiSettings?.isConfigured && (
+              <span className="inline-flex items-center gap-1 rounded bg-emerald-500/10 px-2 py-0.5 font-mono text-[10px] text-emerald-600 dark:text-emerald-400">
+                <CheckCircle2 className="size-3" /> Active
+              </span>
+            )}
+          </div>
+
+          {/* Form to Set / Update Key */}
+          <form onSubmit={handleValidateAndSave} className="space-y-3">
+            <div className="grid gap-2">
+              <Label htmlFor="gemini-api-key" className="text-xs font-medium">
+                {aiSettings?.isConfigured ? "Update API Key" : "Enter Google Gemini API Key"}
+              </Label>
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                <Input
+                  id="gemini-api-key"
+                  type="password"
+                  value={apiKeyInput}
+                  onChange={(e) => setApiKeyInput(e.target.value)}
+                  placeholder={
+                    aiSettings?.isConfigured
+                      ? "Paste new AIzaSy... key to replace current"
+                      : "AIzaSy..."
+                  }
+                  className="flex-1 font-mono text-xs"
+                  required
+                />
+                <Button
+                  type="submit"
+                  disabled={isValidating || !apiKeyInput.trim()}
+                  className="text-xs"
+                >
+                  {isValidating ? (
+                    <>
+                      <Loader2 className="size-3.5 animate-spin" />
+                      Validating with Google...
+                    </>
+                  ) : (
+                    "Validate & Save"
+                  )}
+                </Button>
+              </div>
+            </div>
+
+            {validationError && (
+              <div className="flex items-center gap-2 text-xs text-red-600 dark:text-red-400">
+                <AlertCircle className="size-3.5 shrink-0" />
+                <span>{validationError}</span>
+              </div>
+            )}
+          </form>
+
+          {/* Dynamic Model Selection */}
+          {aiSettings?.isConfigured && availableModels.length > 0 && (
+            <div className="border-t border-border/70 pt-5">
+              <div className="grid gap-2">
+                <Label htmlFor="default-model" className="text-xs font-medium">
+                  Default AI Model
+                </Label>
+                <p className="text-[11px] text-muted-foreground">
+                  Select the default Gemini model used for new agent interactions.
+                </p>
+                <div className="flex items-center gap-2 mt-1">
+                  <Sparkles className="size-4 text-muted-foreground" />
+                  <select
+                    id="default-model"
+                    value={aiSettings.model}
+                    onChange={handleModelChange}
+                    className="flex-1 border border-border bg-background px-3 py-2 text-xs font-mono outline-none focus:border-primary cursor-pointer"
+                  >
+                    {availableModels.map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.displayName} ({m.id})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Help link */}
+          <div className="border-t border-border/70 pt-4 flex items-center justify-between text-[11px] text-muted-foreground">
+            <span>Don&apos;t have an API key yet?</span>
+            <a
+              href="https://aistudio.google.com/app/apikey"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-primary hover:underline"
+            >
+              Get Gemini API Key on Google AI Studio
+              <ExternalLink className="size-3" />
+            </a>
+          </div>
+        </div>
+      </SettingsPanel>
+
+      <SettingsPanel
+        title="Agentic Tool Connectors & MCP"
+        description="Connect tools, skills, and model context protocol (MCP) servers to empower your AI assistant across projects."
+      >
+        <div className="border border-dashed border-border/80 p-5 text-center">
+          <p className="text-xs font-medium text-foreground">Future Connectors & Skills Ready</p>
+          <p className="mt-1 text-[11px] text-muted-foreground max-w-md mx-auto">
+            This workspace starter is designed for agentic tool execution. Custom MCP servers and
+            tool plugins can be plugged in seamlessly.
+          </p>
+        </div>
+      </SettingsPanel>
+    </div>
   );
 }

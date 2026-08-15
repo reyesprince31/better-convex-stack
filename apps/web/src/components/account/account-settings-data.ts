@@ -1,12 +1,13 @@
-import { Bell, CircleUserRound, ShieldCheck, TriangleAlert, Wrench } from "lucide-react";
+import { Bell, CircleUserRound, ShieldCheck, Sparkles, TriangleAlert, Wrench } from "lucide-react";
 
 export const DELETE_CONFIRMATION = "delete my account";
 export const NOTIFICATION_STORAGE_KEY = "starter-kit:account-notifications:v1";
 
-export type AccountTab = "profile" | "security" | "notifications" | "advanced" | "danger";
+export type AccountTab = "profile" | "ai" | "security" | "notifications" | "advanced" | "danger";
 
 export const accountTabs = [
   { id: "profile", label: "Profile", icon: CircleUserRound },
+  { id: "ai", label: "AI & Providers", icon: Sparkles },
   { id: "security", label: "Security", icon: ShieldCheck },
   { id: "notifications", label: "Notifications", icon: Bell },
   { id: "advanced", label: "Advanced", icon: Wrench },

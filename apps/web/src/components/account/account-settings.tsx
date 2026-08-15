@@ -14,12 +14,14 @@ import { authClient } from "@/lib/auth-client";
 
 import {
   AccountAdvancedPanel,
+  AiSettingsPanel,
   DangerSettingsPanel,
   DeleteAccountDialog,
   NotificationSettingsPanel,
   ProfileSettingsPanel,
   SecuritySettingsPanel,
 } from "./account-settings-panels";
+
 import {
   accountTabs,
   defaultNotificationSettings,
@@ -250,6 +252,8 @@ export default function AccountSettings() {
           onSubmit={(event) => void saveProfile(event)}
         />
       ) : null}
+
+      {activeTab === "ai" ? <AiSettingsPanel /> : null}
 
       {activeTab === "security" ? (
         <SecuritySettingsPanel
