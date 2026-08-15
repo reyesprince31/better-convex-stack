@@ -13,7 +13,7 @@
     "dev:web": "turbo run dev -F web",
     "dev:server": "turbo run dev -F @better-convex-stack/backend",
     "dev:setup": "turbo run dev:setup -F @better-convex-stack/backend",
-    "check": "oxlint && oxfmt --write"
+    "check": "oxlint --ignore-path=.oxlintignore && oxfmt --write"
   },
   "dependencies": {
     "@better-convex-stack/env": "workspace:*",

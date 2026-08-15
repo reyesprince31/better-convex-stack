@@ -13,7 +13,7 @@ catalog:
   react: ^19.2.8
   react-dom: ^19.2.8
   sonner: ^2.0.7
-  convex: ^1.42.3
+  convex: ^1.44.0
   better-auth: 1.6.25
   "@convex-dev/better-auth": ^0.12.5
   "@tailwindcss/postcss": ^4.3.3
