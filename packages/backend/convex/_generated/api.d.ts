@@ -15,6 +15,7 @@ import type * as announcementRules from "../announcementRules.js";
 import type * as announcements from "../announcements.js";
 import type * as audit from "../audit.js";
 import type * as auth from "../auth.js";
+import type * as chat from "../chat.js";
 import type * as entitlements from "../entitlements.js";
 import type * as files from "../files.js";
 import type * as healthCheck from "../healthCheck.js";
@@ -37,6 +38,7 @@ declare const fullApi: ApiFromModules<{
   announcements: typeof announcements;
   audit: typeof audit;
   auth: typeof auth;
+  chat: typeof chat;
   entitlements: typeof entitlements;
   files: typeof files;
   healthCheck: typeof healthCheck;
@@ -76,4 +78,5 @@ export declare const components: {
   betterAuth: import("../betterAuth/_generated/component.js").ComponentApi<"betterAuth">;
   rateLimiter: import("@convex-dev/rate-limiter/_generated/component.js").ComponentApi<"rateLimiter">;
   r2: import("@convex-dev/r2/_generated/component.js").ComponentApi<"r2">;
+  agent: import("@convex-dev/agent/_generated/component.js").ComponentApi<"agent">;
 };

@@ -71,4 +71,42 @@ export default defineSchema({
   })
     .index("by_userId", ["userId"])
     .index("by_updatedAt", ["updatedAt"]),
+  aiSettings: defineTable({
+    userId: v.optional(v.string()),
+    keyIdentifier: v.string(),
+    provider: v.optional(v.union(v.literal("google"), v.literal("openai"))),
+    apiKey: v.string(),
+    model: v.string(),
+    availableModels: v.array(
+      v.object({
+        id: v.string(),
+        displayName: v.string(),
+        description: v.optional(v.string()),
+      }),
+    ),
+    openaiApiKey: v.optional(v.string()),
+    openaiModel: v.optional(v.string()),
+    openaiAvailableModels: v.optional(
+      v.array(
+        v.object({
+          id: v.string(),
+          displayName: v.string(),
+          description: v.optional(v.string()),
+        }),
+      ),
+    ),
+    updatedAt: v.number(),
+  })
+    .index("by_keyIdentifier", ["keyIdentifier"])
+    .index("by_userId", ["userId"]),
+  threads: defineTable({
+    userId: v.string(),
+    agentThreadId: v.string(),
+    title: v.string(),
+    model: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_userId_and_updatedAt", ["userId", "updatedAt"])
+    .index("by_agentThreadId", ["agentThreadId"]),
 });
