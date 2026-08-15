@@ -102,9 +102,6 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
     secret: env.BETTER_AUTH_SECRET,
     baseURL: siteUrl,
     trustedOrigins: [siteUrl],
-    rateLimit: {
-      enabled: false,
-    },
     session: {
       expiresIn: 60 * 60 * 24 * 7,
       updateAge: 60 * 60 * 24,
