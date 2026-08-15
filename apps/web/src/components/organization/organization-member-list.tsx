@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@better-convex-stack/ui/components/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@better-convex-stack/ui/components/avatar";
 import { Skeleton } from "@better-convex-stack/ui/components/skeleton";
 import { ShieldCheck, UserCheck, Users } from "lucide-react";
 
@@ -71,18 +67,26 @@ export function OrganizationMemberList({
               >
                 <div className="flex min-w-0 items-center gap-3">
                   <Avatar size="default">
-                    {member.user.image ? <AvatarImage src={member.user.image} alt={member.user.name} /> : null}
+                    {member.user.image ? (
+                      <AvatarImage src={member.user.image} alt={member.user.name} />
+                    ) : null}
                     <AvatarFallback>{getInitials(member.user.name)}</AvatarFallback>
                   </Avatar>
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium">{member.user.name}</p>
-                    <p className="mt-0.5 truncate text-xs text-muted-foreground">{member.user.email}</p>
+                    <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                      {member.user.email}
+                    </p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3 sm:shrink-0">
                   <span className="inline-flex items-center gap-1.5 font-mono text-[10px] tracking-wider text-muted-foreground uppercase">
-                    {memberIsOwner ? <ShieldCheck className="size-3 text-emerald-600" /> : <UserCheck className="size-3" />}
+                    {memberIsOwner ? (
+                      <ShieldCheck className="size-3 text-emerald-600" />
+                    ) : (
+                      <UserCheck className="size-3" />
+                    )}
                     {formatOrganizationRole(member.role)}
                   </span>
                   <select
@@ -105,7 +109,9 @@ export function OrganizationMemberList({
         <div className="p-8 text-center">
           <Users className="mx-auto size-5 text-muted-foreground" />
           <p className="mt-3 text-sm font-medium">No members found</p>
-          <p className="mt-1 text-xs text-muted-foreground">Invite the first teammate to start sharing this workspace.</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Invite the first teammate to start sharing this workspace.
+          </p>
         </div>
       )}
     </section>

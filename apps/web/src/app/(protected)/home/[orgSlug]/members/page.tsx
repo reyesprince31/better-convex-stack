@@ -14,11 +14,7 @@ export default function OrganizationMembersPage({
   );
 }
 
-async function OrganizationMembersContent({
-  params,
-}: {
-  params: Promise<{ orgSlug: string }>;
-}) {
+async function OrganizationMembersContent({ params }: { params: Promise<{ orgSlug: string }> }) {
   const { orgSlug } = await params;
   return <OrganizationMembersView orgSlug={orgSlug} />;
 }

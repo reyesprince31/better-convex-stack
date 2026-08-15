@@ -2,11 +2,7 @@ import { Suspense } from "react";
 
 import { OrganizationOverview } from "@/components/organization/organization-overview";
 
-export default function OrganizationHomePage({
-  params,
-}: {
-  params: Promise<{ orgSlug: string }>;
-}) {
+export default function OrganizationHomePage({ params }: { params: Promise<{ orgSlug: string }> }) {
   return (
     <Suspense fallback={<OrganizationHomePageLoading />}>
       <OrganizationHomeContent params={params} />
@@ -14,11 +10,7 @@ export default function OrganizationHomePage({
   );
 }
 
-async function OrganizationHomeContent({
-  params,
-}: {
-  params: Promise<{ orgSlug: string }>;
-}) {
+async function OrganizationHomeContent({ params }: { params: Promise<{ orgSlug: string }> }) {
   const { orgSlug } = await params;
   return <OrganizationOverview orgSlug={orgSlug} />;
 }

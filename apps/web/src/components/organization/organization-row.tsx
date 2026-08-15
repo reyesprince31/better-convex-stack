@@ -1,6 +1,11 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarGroup, AvatarImage } from "@better-convex-stack/ui/components/avatar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarGroup,
+  AvatarImage,
+} from "@better-convex-stack/ui/components/avatar";
 import { Button } from "@better-convex-stack/ui/components/button";
 import {
   DropdownMenu,
@@ -9,7 +14,11 @@ import {
   DropdownMenuTrigger,
 } from "@better-convex-stack/ui/components/dropdown-menu";
 import { Skeleton } from "@better-convex-stack/ui/components/skeleton";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@better-convex-stack/ui/components/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@better-convex-stack/ui/components/tooltip";
 import { Check, MoreHorizontal, Pencil, Trash2, Users } from "lucide-react";
 import Link from "next/link";
 
@@ -95,7 +104,10 @@ export function OrganizationRow({
                         <AvatarFallback className="text-[10px]">{member.initials}</AvatarFallback>
                       </Avatar>
                     </TooltipTrigger>
-                    <TooltipContent side="top" className="flex flex-col gap-0.5 px-2.5 py-1 text-xs">
+                    <TooltipContent
+                      side="top"
+                      className="flex flex-col gap-0.5 px-2.5 py-1 text-xs"
+                    >
                       <p className="font-medium text-background">{member.name}</p>
                       <div className="flex items-center gap-1.5 text-[10px] text-background/75">
                         <span className="capitalize">{member.role || "member"}</span>
@@ -111,7 +123,9 @@ export function OrganizationRow({
                         size="sm"
                         className="cursor-pointer bg-muted text-muted-foreground transition-transform hover:z-20 hover:scale-110"
                       >
-                        <AvatarFallback className="text-[10px] font-semibold">+{overflowCount}</AvatarFallback>
+                        <AvatarFallback className="text-[10px] font-semibold">
+                          +{overflowCount}
+                        </AvatarFallback>
                       </Avatar>
                     </TooltipTrigger>
                     <TooltipContent side="top" className="px-2.5 py-1 text-xs">
@@ -135,7 +149,9 @@ export function OrganizationRow({
         </div>
 
         <div className="hidden h-4 w-px bg-border/70 md:block" />
-        <p className="text-xs text-muted-foreground">Created {formatOrganizationDate(organization.createdAt)}</p>
+        <p className="text-xs text-muted-foreground">
+          Created {formatOrganizationDate(organization.createdAt)}
+        </p>
 
         <DropdownMenu>
           <DropdownMenuTrigger

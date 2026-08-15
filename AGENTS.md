@@ -1,4 +1,5 @@
 <!-- BEGIN:nextjs-agent-rules -->
+
 # This is NOT the Next.js you know
 
 This version has breaking changes - APIs, conventions, and file structure may
@@ -6,7 +7,6 @@ all differ from your training data. Before writing Next.js code, read the
 relevant guide in `apps/web/node_modules/next/dist/docs/`. Heed deprecation
 notices.
 <!-- END:nextjs-agent-rules -->
-
 
 <!-- web-architecture-start -->
 
@@ -23,12 +23,12 @@ notices.
 `@types/react` 19 deprecates `FormEvent` and `FormEventHandler` — they were never
 real DOM events. Do not use them in new code or when touching existing handlers.
 
-| Handler | Use instead |
-|---------|-------------|
-| `onSubmit` | `React.SubmitEvent` — `event.target` is typed as `HTMLFormElement` |
-| `onChange` (inputs) | `React.ChangeEvent<HTMLInputElement>` (or the matching element) |
-| `onInput` | `React.InputEvent` |
-| Generic / unknown | `React.SyntheticEvent` |
+| Handler             | Use instead                                                        |
+| ------------------- | ------------------------------------------------------------------ |
+| `onSubmit`          | `React.SubmitEvent` — `event.target` is typed as `HTMLFormElement` |
+| `onChange` (inputs) | `React.ChangeEvent<HTMLInputElement>` (or the matching element)    |
+| `onInput`           | `React.InputEvent`                                                 |
+| Generic / unknown   | `React.SyntheticEvent`                                             |
 
 For `FormData`, read from `event.target` on submit handlers, not
 `event.currentTarget` (`SubmitEvent` only narrows `target`).
@@ -42,13 +42,13 @@ For `FormData`, read from `event.target` on submit handlers, not
 This file is the agent and contributor contract. Human-oriented overview:
 [README.md](README.md).
 
-| Topic | Document |
-|-------|----------|
-| Web routing, CRUD UX, SPA loading, auth layers | [docs/APP_ARCHITECTURE_STANDARDS.md](docs/APP_ARCHITECTURE_STANDARDS.md) |
-| Reusable selectors, reference data, maintenance pages | [docs/REFERENCE_DATA_STANDARDS.md](docs/REFERENCE_DATA_STANDARDS.md) |
-| Better Auth + Convex auth wiring | [docs/AUTH_SETUP.md](docs/AUTH_SETUP.md) |
-| Production deploy (Vercel + Convex) | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) |
-| Implementation progress | [docs/TASKLIST.md](docs/TASKLIST.md) |
+| Topic                                                 | Document                                                                 |
+| ----------------------------------------------------- | ------------------------------------------------------------------------ |
+| Web routing, CRUD UX, SPA loading, auth layers        | [docs/APP_ARCHITECTURE_STANDARDS.md](docs/APP_ARCHITECTURE_STANDARDS.md) |
+| Reusable selectors, reference data, maintenance pages | [docs/REFERENCE_DATA_STANDARDS.md](docs/REFERENCE_DATA_STANDARDS.md)     |
+| Better Auth + Convex auth wiring                      | [docs/AUTH_SETUP.md](docs/AUTH_SETUP.md)                                 |
+| Production deploy (Vercel + Convex)                   | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)                                 |
+| Implementation progress                               | [docs/TASKLIST.md](docs/TASKLIST.md)                                     |
 
 When standards conflict, prefer the more specific doc for that topic (for
 example CRUD patterns in APP_ARCHITECTURE_STANDARDS, deploy steps in
@@ -101,7 +101,7 @@ member, organization, admin, and future CRUD surfaces.
 - Pad form content with `px-5 pt-5 sm:px-6 sm:pt-6`; leave the form bottom
   open so the shared `DialogFooter` owns the single horizontal and bottom inset.
   Keep that footer padding intact. The shared footer owns protected `!px-5
-  !py-5 sm:!px-6 sm:!py-6` spacing for every dialog. Do not use `p-0`, negative
+!py-5 sm:!px-6 sm:!py-6` spacing for every dialog. Do not use `p-0`, negative
   margins, or `border-t-0` on a footer unless a deliberate edge-to-edge
   treatment is documented and visually verified.
 - Use real native button semantics through the shared `Button` component, and

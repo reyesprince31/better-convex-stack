@@ -23,12 +23,7 @@ const shapeClasses: Record<AvatarShape, string> = {
   square: "rounded-none",
 };
 
-function Avatar({
-  className,
-  size = "default",
-  shape = "circle",
-  ...props
-}: AvatarProps) {
+function Avatar({ className, size = "default", shape = "circle", ...props }: AvatarProps) {
   return (
     <span
       data-slot="avatar"
@@ -38,20 +33,14 @@ function Avatar({
         "relative flex shrink-0 items-center justify-center overflow-hidden bg-muted font-mono font-medium text-foreground select-none ring-1 ring-background",
         sizeClasses[size],
         shapeClasses[shape],
-        className
+        className,
       )}
       {...props}
     />
   );
 }
 
-function AvatarImage({
-  className,
-  src,
-  alt = "",
-  onError,
-  ...props
-}: React.ComponentProps<"img">) {
+function AvatarImage({ className, src, alt = "", onError, ...props }: React.ComponentProps<"img">) {
   const [hasError, setHasError] = React.useState(false);
 
   if (!src || hasError) {
@@ -73,17 +62,13 @@ function AvatarImage({
   );
 }
 
-function AvatarFallback({
-  className,
-  children,
-  ...props
-}: React.ComponentProps<"span">) {
+function AvatarFallback({ className, children, ...props }: React.ComponentProps<"span">) {
   return (
     <span
       data-slot="avatar-fallback"
       className={cn(
         "flex size-full items-center justify-center uppercase tracking-tight",
-        className
+        className,
       )}
       {...props}
     >
@@ -92,11 +77,7 @@ function AvatarFallback({
   );
 }
 
-function AvatarGroup({
-  className,
-  children,
-  ...props
-}: React.ComponentProps<"div">) {
+function AvatarGroup({ className, children, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="avatar-group"
