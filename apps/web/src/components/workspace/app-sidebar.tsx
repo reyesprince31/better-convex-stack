@@ -3,6 +3,7 @@ import {
   Building2,
   FolderKanban,
   LayoutDashboard,
+  Megaphone,
   Settings2,
   ShieldCheck,
   Users,
@@ -38,6 +39,7 @@ const adminLinks = [
   { label: "Overview", path: "/admin/overview", icon: LayoutDashboard },
   { label: "Members", path: "/admin/users", icon: Users },
   { label: "Organizations", path: "/admin/organizations", icon: Building2 },
+  { label: "Announcements", path: "/admin/announcements", icon: Megaphone },
   { label: "Activity", path: "/admin/subscriptions", icon: Activity },
 ] as const;
 

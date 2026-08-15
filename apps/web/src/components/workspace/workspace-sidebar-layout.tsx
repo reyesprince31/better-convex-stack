@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+
 import { Separator } from "@better-convex-stack/ui/components/separator";
 import {
   SidebarInset,
@@ -5,6 +7,7 @@ import {
   SidebarTrigger,
 } from "@better-convex-stack/ui/components/sidebar";
 
+import { AnnouncementBanner } from "@/components/announcements/announcement-banner";
 import { AppSidebar } from "@/components/workspace/app-sidebar";
 
 export function WorkspaceSidebarLayout({
@@ -20,6 +23,9 @@ export function WorkspaceSidebarLayout({
     <SidebarProvider className="h-svh max-h-svh min-h-0 overflow-hidden bg-sidebar">
       <AppSidebar kind={kind} orgSlug={orgSlug} />
       <SidebarInset className="min-h-0 overflow-hidden md:border md:border-border/80">
+        <Suspense fallback={null}>
+          <AnnouncementBanner />
+        </Suspense>
         <header className="flex h-16 shrink-0 items-center gap-2 border-b border-border/70 bg-background/90 px-4 backdrop-blur-xl sm:px-6">
           <SidebarTrigger className="-ml-1" />
           <Separator
