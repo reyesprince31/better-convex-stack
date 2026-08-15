@@ -60,7 +60,12 @@ export function AdminOrganizationRoster({
                 </p>
               </div>
             </div>
-            <Button type="button" size="sm" className="w-full gap-2 sm:w-auto" onClick={onAddMember}>
+            <Button
+              type="button"
+              size="sm"
+              className="w-full gap-2 sm:w-auto"
+              onClick={onAddMember}
+            >
               <Plus />
               Add member
             </Button>

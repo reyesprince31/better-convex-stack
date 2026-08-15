@@ -218,7 +218,13 @@ export function AdminOrganizationsManagement() {
           <p className="mt-1 text-xs text-muted-foreground">
             {usersError} Create an owner in the Members area first.
           </p>
-          <Button type="button" variant="outline" size="sm" className="mt-4" onClick={() => void loadUsers()}>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="mt-4"
+            onClick={() => void loadUsers()}
+          >
             Try again
           </Button>
         </section>
@@ -228,8 +234,8 @@ export function AdminOrganizationsManagement() {
         <section className="border border-amber-500/30 bg-amber-500/5 p-5 text-sm">
           <p className="font-medium">Create a member before creating an organization</p>
           <p className="mt-1 text-xs text-muted-foreground">
-            Every organization needs a first owner. Add that member in the Members area, then
-            return here.
+            Every organization needs a first owner. Add that member in the Members area, then return
+            here.
           </p>
           <Link
             href="/admin/users"
@@ -246,9 +252,7 @@ export function AdminOrganizationsManagement() {
           usersById={usersById}
           selectedOrganizationId={selectedOrganizationId}
           onSelect={setSelectedOrganizationId}
-          onEdit={(organization) =>
-            setDialog({ mode: "edit", organizationId: organization.id })
-          }
+          onEdit={(organization) => setDialog({ mode: "edit", organizationId: organization.id })}
           onDelete={(organization) =>
             setDialog({ mode: "delete-organization", organizationId: organization.id })
           }

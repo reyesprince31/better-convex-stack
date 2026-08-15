@@ -98,7 +98,12 @@ export function AdminOrganizationDirectory({
                     >
                       Manage <ChevronRight />
                     </Button>
-                    <Button type="button" variant="ghost" size="sm" onClick={() => onEdit(organization)}>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onEdit(organization)}
+                    >
                       Edit
                     </Button>
                     <Button

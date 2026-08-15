@@ -22,6 +22,7 @@ import {
   type UserDialogState,
   type UserFormValues,
   type UserRole,
+  type SubscriptionTier,
 } from "./admin-management-utils";
 
 type AdminUserDialogProps = {
@@ -45,6 +46,7 @@ export function AdminUserDialog({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<UserRole>("user");
+  const [tier, setTier] = useState<SubscriptionTier>("free");
   const [formError, setFormError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -52,10 +54,12 @@ export function AdminUserDialog({
       setName(user.name);
       setEmail(user.email);
       setRole(user.role === "admin" ? "admin" : "user");
+      setTier(user.tier ?? "free");
     } else {
       setName("");
       setEmail("");
       setRole("user");
+      setTier("free");
     }
     setPassword("");
     setFormError(null);
@@ -91,7 +95,7 @@ export function AdminUserDialog({
 
     setFormError(null);
     try {
-      await onSave({ name: nextName, email: nextEmail, password: nextPassword, role });
+      await onSave({ name: nextName, email: nextEmail, password: nextPassword, role, tier });
     } catch (error) {
       setFormError(getErrorMessage(error, "The member could not be saved."));
     }
@@ -122,7 +126,12 @@ export function AdminUserDialog({
                   </Button>
                 }
               />
-              <Button type="button" variant="destructive" disabled={isPending} onClick={() => void onRemove()}>
+              <Button
+                type="button"
+                variant="destructive"
+                disabled={isPending}
+                onClick={() => void onRemove()}
+              >
                 {isPending ? "Removing…" : "Remove member"}
               </Button>
             </DialogFooter>
@@ -191,6 +200,21 @@ export function AdminUserDialog({
                 >
                   <option value="user">User</option>
                   <option value="admin">Admin</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="admin-member-tier">Tier</Label>
+                <select
+                  id="admin-member-tier"
+                  name="tier"
+                  value={tier}
+                  onChange={(event) => setTier(event.target.value as SubscriptionTier)}
+                  disabled={isPending}
+                  className="h-9 w-full border border-input bg-background px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-1 focus-visible:ring-ring/50"
+                >
+                  <option value="free">Free</option>
+                  <option value="pro">Pro</option>
+                  <option value="enterprise">Enterprise</option>
                 </select>
               </div>
               {formError ? (
