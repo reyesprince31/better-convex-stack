@@ -116,3 +116,29 @@ member, organization, admin, and future CRUD surfaces.
   checks, oxlint, and the production web build.
 
 <!-- management-dialog-standard-end -->
+
+<!-- folder-driven-feature-architecture-start -->
+
+# Folder-Driven Feature Architecture
+
+Group feature logic into dedicated domain folders across backend and frontend instead of single monolithic files.
+
+## 1. Backend (`packages/backend/convex/<feature>/`)
+
+Structure each backend feature as a dedicated folder:
+
+- `<feature>/tools.ts` — External tools and integration helpers (Zod schemas).
+- `<feature>/threads.ts` (or `queries.ts`/`mutations.ts`) — Database operations with explicit `args` and `returns` validators. Use `.withIndex()` and bound reads (`.take(n)` or `.paginate()`).
+- `<feature>/actions.ts` — External API calls and LLM model runs.
+- `<feature>/index.ts` — Central domain re-export.
+- Keep `convex/<feature>.ts` as a 1-line root re-export (`export * from "./<feature>/index"`) for backward-compatible `api.<feature>.*` calls.
+
+## 2. Frontend (`apps/web/src/components/<feature>/`)
+
+Keep component architecture flat, clean, and beginner-friendly:
+
+- `*-interface.tsx` — Feature page orchestrator (Convex queries/actions, auth session, state).
+- Main view panels (e.g. list, window/content, inspector/details).
+- `*-types.ts` & `*-utils.ts` — Local domain interfaces and pure formatting helpers.
+
+<!-- folder-driven-feature-architecture-end -->
