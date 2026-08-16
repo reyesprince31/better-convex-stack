@@ -11,6 +11,12 @@
 import type * as account from "../account.js";
 import type * as admin from "../admin.js";
 import type * as adminAuth from "../adminAuth.js";
+import type * as agent from "../agent.js";
+import type * as agent_actions from "../agent/actions.js";
+import type * as agent_definitions from "../agent/definitions.js";
+import type * as agent_index from "../agent/index.js";
+import type * as agent_threads from "../agent/threads.js";
+import type * as agent_tools from "../agent/tools.js";
 import type * as announcementRules from "../announcementRules.js";
 import type * as announcements from "../announcements.js";
 import type * as audit from "../audit.js";
@@ -36,6 +42,12 @@ declare const fullApi: ApiFromModules<{
   account: typeof account;
   admin: typeof admin;
   adminAuth: typeof adminAuth;
+  agent: typeof agent;
+  "agent/actions": typeof agent_actions;
+  "agent/definitions": typeof agent_definitions;
+  "agent/index": typeof agent_index;
+  "agent/threads": typeof agent_threads;
+  "agent/tools": typeof agent_tools;
   announcementRules: typeof announcementRules;
   announcements: typeof announcements;
   audit: typeof audit;
@@ -83,4 +95,5 @@ export declare const components: {
   rateLimiter: import("@convex-dev/rate-limiter/_generated/component.js").ComponentApi<"rateLimiter">;
   r2: import("@convex-dev/r2/_generated/component.js").ComponentApi<"r2">;
   resend: import("@convex-dev/resend/_generated/component.js").ComponentApi<"resend">;
+  agent: import("@convex-dev/agent/_generated/component.js").ComponentApi<"agent">;
 };
