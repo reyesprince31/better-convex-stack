@@ -60,7 +60,8 @@ export default function ForgotPasswordForm() {
       >
         <div className="space-y-4 text-center">
           <p className="text-sm text-muted-foreground">
-            Click the link inside the email to set a new password. If you don't see it, check your spam folder.
+            Click the link inside the email to set a new password. If you don't see it, check your
+            spam folder.
           </p>
           <Button
             variant="outline"
