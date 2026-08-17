@@ -73,7 +73,8 @@ export default function ResetPasswordForm() {
       >
         <div className="space-y-4">
           <p className="text-sm text-muted-foreground text-center">
-            Password reset links expire after 1 hour or after being used. Please request a fresh reset link.
+            Password reset links expire after 1 hour or after being used. Please request a fresh
+            reset link.
           </p>
           <Button
             render={<Link href="/forgot-password">Request new reset link</Link>}
