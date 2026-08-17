@@ -5,12 +5,12 @@ import { PersonalHeader } from "@/components/workspace/personal-header";
 
 export default function PersonalLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-svh bg-background">
+    <div className="flex h-svh max-h-svh min-h-0 flex-col overflow-hidden bg-background">
       <Suspense fallback={null}>
         <AnnouncementBanner />
       </Suspense>
       <PersonalHeader />
-      <main className="mx-auto w-full max-w-7xl px-5 py-8 sm:px-8 lg:py-10">{children}</main>
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">{children}</div>
     </div>
   );
 }
